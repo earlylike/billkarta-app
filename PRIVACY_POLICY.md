@@ -21,4 +21,4 @@ on your phone. WhatsApp's own privacy policy applies from there.
 
 **Children:** The app is not directed at children.
 
-**Contact:** manalisapkal299@gmail.com
+**Contact:** gurulinggaidhankar@gmail.com
