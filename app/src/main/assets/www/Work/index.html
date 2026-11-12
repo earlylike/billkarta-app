@@ -322,6 +322,10 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
 :lang(kn) #addh::before{content:"ಹೊಸ ನಮೂದು";letter-spacing:0;font-size:.8rem}
 #listh{position:relative;display:inline-block;max-width:100%;margin:0 0 1.6rem;padding:.55rem 1.3rem;font-size:1.2rem;font-weight:600;line-height:1.2;color:#fff;border-radius:26px;background:linear-gradient(135deg,#0ea5e9,#6366f1);box-shadow:0 8px 18px rgba(79,70,229,.28)}
 #listh::after{content:"";position:absolute;left:1.9rem;bottom:-.85rem;width:1.4rem;height:1rem;background:#1d8be9;clip-path:polygon(0 0,100% 0,0 100%)}
+
+/* BK-SETTINGS-CARDS */
+#settings .card{margin:0 0 1rem}
+#settings .card h2{margin-top:0}
 </style>
 </head>
 <body data-tab="duty">
@@ -372,7 +376,8 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
     </form>
   </section>
 
-  <section class="card" id="settings" aria-labelledby="sth">
+  <section id="settings" aria-labelledby="sth">
+<div class="card" id="ratescard">
     <h2 class="ratesh" id="sth"><span class="ratesh-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 5h10M7 9h10M7 5h3.2a3.5 3.5 0 010 7H7l7 7"/></svg></span><span class="ratesh-t">Rates</span></h2>
     <label class="lbl" for="name">Your name</label>
     <input type="text" class="name" id="name" maxlength="60" autocomplete="name" placeholder="Enter your name">
@@ -381,7 +386,8 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
       <div><label class="lbl" for="r-full">Full day (Rs.)</label><input type="number" id="r-full" min="0" step="1" inputmode="numeric"></div>
     </div>
   <div class="dlg-actions"><button type="button" class="btn" id="s-done">Save</button></div>
-    <div id="bkcard">
+    </div>
+<div class="card" id="bkcard">
       <h2 class="bkh"><span class="bkh-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4.5 19.5h15"/></svg></span><span class="bkh-t">Backup</span></h2>
       <p class="hint">Save a copy of all your data to a file, or restore it from a backup file. Export regularly, and before reinstalling the app or clearing browser data.</p>
       <div class="bkbtns">
@@ -392,7 +398,7 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
       <p class="msg" id="bkmsg" aria-live="polite"></p>
       <div id="bkacts"></div>
     </div>
-    <div id="langcard">
+    <div class="card" id="langcard">
       <h2 class="langh"><span class="langh-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.4 4 5.5 4 9s-1.4 6.6-4 9c-2.6-2.4-4-5.5-4-9s1.4-6.6 4-9z"/></svg></span><span class="langh-t">Languages</span><span class="langh-chips" aria-hidden="true"><i>A</i><i>अ</i></span></h2>
       <div class="seg" role="radiogroup" aria-label="Languages">
         <input type="radio" name="lang" id="lang-en" value="en" checked><label for="lang-en">English</label>
@@ -405,13 +411,13 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
         <input type="radio" name="lang" id="lang-kn" value="kn"><label for="lang-kn">ಕನ್ನಡ</label>
       </div>
     </div>
-    <div id="dzcard">
+    <div class="card" id="dzcard">
       <h2 class="th"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg><span class="tt">Delete All Records</span></h2>
       <p class="hint">This moves every duty entry and every advance to Trash. You can restore them from there.</p>
       <button class="btn outdanger" id="delall" type="button">Delete All Entries And Advances</button>
       <p class="msg" id="dzmsg" aria-live="polite"></p>
     </div>
-    <div id="trashcard">
+    <div class="card" id="trashcard">
       <h2 class="th"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg><span class="tt">Trash</span><span class="count" id="tcount"></span></h2>
       <div id="tlist"></div>
       <p class="msg" id="tmsg" aria-live="polite"></p>
