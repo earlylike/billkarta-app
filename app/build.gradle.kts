@@ -34,18 +34,8 @@ android {
         }
     }
 
-    buildFeatures {
-        buildConfig = true
-    }
-
     buildTypes {
-        debug {
-            // Test builds allow screenshots (for the Play Store listing).
-            buildConfigField("boolean", "BLOCK_SCREENSHOTS", "false")
-        }
         release {
-            // The Play Store build blocks screenshots and screen recording.
-            buildConfigField("boolean", "BLOCK_SCREENSHOTS", "true")
             isMinifyEnabled = false
             if (keystoreProps.containsKey("storeFile")) {
                 signingConfig = signingConfigs.getByName("release")
