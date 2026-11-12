@@ -326,6 +326,24 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
 /* BK-SETTINGS-CARDS */
 #settings .card{margin:0 0 1rem}
 #settings .card h2{margin-top:0}
+
+/* BK-CARD-COLORS */
+.card{--tint:#e4defc;background:var(--tint);background-clip:padding-box;border:7px solid var(--card);
+  border-radius:26px;box-shadow:var(--shadow)}
+@media (prefers-color-scheme:dark){.card{background:color-mix(in srgb,var(--tint) 17%,var(--card));background-clip:padding-box}}
+.card input:not([type=radio]):not([type=checkbox]):not([type=file]):not([type=range]),.card select,.card textarea{background:var(--card)}
+
+.card[aria-labelledby="addh"]{--tint:#c8f3dc}
+.card[aria-label="Summary"]{--tint:#e4defc}
+.card[aria-labelledby="listh"]{--tint:#d3ebfb}
+#adv.card{--tint:#fde3cf}
+.card[aria-label="Bill"]{--tint:#fdf1c2}
+.card[aria-labelledby="wah"]{--tint:#c8f3dc}
+#ratescard{--tint:#fde3cf}
+#bkcard{--tint:#d3ebfb}
+#langcard{--tint:#e4defc}
+#dzcard{--tint:#fbd9e3}
+#trashcard{--tint:#fbd9e3}
 </style>
 </head>
 <body data-tab="duty">

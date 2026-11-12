@@ -407,6 +407,23 @@
     .card{padding:1.05rem}
     .hero h1{font-size:1.4rem}
   }
+
+/* BK-CARD-COLORS */
+.card{--tint:#e4defc;background:var(--tint);background-clip:padding-box;border:7px solid var(--card);
+  border-radius:26px;box-shadow:var(--shadow)}
+@media (prefers-color-scheme:dark){.card{background:color-mix(in srgb,var(--tint) 17%,var(--card));background-clip:padding-box}}
+.card input:not([type=radio]):not([type=checkbox]):not([type=file]):not([type=range]),.card select,.card textarea{background:var(--card)}
+
+.card:has(#addh){--tint:#c8f3dc}
+.card:has(#list){--tint:#d3ebfb}
+#bill.card{--tint:#fdf1c2}
+#details.card{--tint:#e4defc}
+.card:has(#rfull){--tint:#fde3cf}
+.card:has(#emps){--tint:#c8f3dc}
+#trashcard{--tint:#fbd9e3}
+#bkcard{--tint:#d3ebfb}
+#langcard{--tint:#e4defc}
+.card:has(#acount){--tint:#fde3cf}
 </style>
 </head>
 <body>
