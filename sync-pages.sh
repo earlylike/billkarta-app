@@ -23,4 +23,5 @@ patch_page () {
 patch_page "$SRC/frontpage/index.html" "$OUT/frontpage/index.html"
 patch_page "$SRC/Work/index.html"      "$OUT/Work/index.html"
 patch_page "$SRC/forall/index.html"    "$OUT/forall/index.html"
+python3 "$(dirname "$0")/tools/patch_location.py" "$OUT"
 echo "Pages synced into $OUT"
