@@ -816,7 +816,7 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
       startY: 34,
       margin: {left: 14, right: 14},
       tableWidth: W - 28,
-      head: [[S('Date'), S('Location'), S('Half Day'), S('Full Day')]],
+      head: [[S('Date'), S('Location/Work'), S('Half Day'), S('Full Day')]],
       body: sorted.map(function(e){ return [fmtNum(e.date), e.location || '-', e.type === 'half' ? '1' : '', e.type === 'full' ? '1' : '']; }),
       theme: 'grid',
       headStyles: {fillColor: [30, 130, 89], textColor: 255, fontStyle: 'bold', fontSize: 10},

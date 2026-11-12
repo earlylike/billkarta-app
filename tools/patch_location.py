@@ -53,3 +53,22 @@ if '"location_work"' not in s:
     print("patched forall")
 else:
     print("forall already patched")
+
+# ---------- PDF column headings ----------
+p = os.path.join(root, "Work", "index.html")
+s = open(p, encoding="utf-8").read()
+old = "head: [[S('Date'), S('Location'), S('Half Day'), S('Full Day')]]"
+if old in s:
+    assert s.count(old) == 1
+    s = s.replace(old, "head: [[S('Date'), S('Location/Work'), S('Half Day'), S('Full Day')]]")
+    open(p, "w", encoding="utf-8").write(s)
+    print("patched Work PDF heading")
+
+p = os.path.join(root, "forall", "index.html")
+s = open(p, encoding="utf-8").read()
+old = '{ t: tx("location"), w: 90 }'
+if old in s:
+    assert s.count(old) == 2, s.count(old)
+    s = s.replace(old, '{ t: tx("location_work"), w: 90 }')
+    open(p, "w", encoding="utf-8").write(s)
+    print("patched forall PDF headings")

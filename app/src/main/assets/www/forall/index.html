@@ -1321,7 +1321,7 @@
     var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
     doc.setLineHeightFactor(1.35);
     var W = 210, H = 297, M = 15, tw = W - 2 * M;
-    var cols = [{ t: tx("date"), w: 30 }, { t: tx("location"), w: 90 }, { t: tx("half_day"), w: 30 }, { t: tx("full_day"), w: 30 }];
+    var cols = [{ t: tx("date"), w: 30 }, { t: tx("location_work"), w: 90 }, { t: tx("half_day"), w: 30 }, { t: tx("full_day"), w: 30 }];
     var y = 22;
     doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(20, 35, 46);
     if (NONLATIN.test(b.name)) {
@@ -1395,7 +1395,7 @@
     var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
     doc.setLineHeightFactor(1.35);
     var W = 210, H = 297, M = 15, tw = W - 2 * M;
-    var cols = [{ t: tx("date"), w: 30 }, { t: tx("location"), w: 90 }, { t: tx("half_day"), w: 30 }, { t: tx("full_day"), w: 30 }];
+    var cols = [{ t: tx("date"), w: 30 }, { t: tx("location_work"), w: 90 }, { t: tx("half_day"), w: 30 }, { t: tx("full_day"), w: 30 }];
     var y = 22;
     put(doc, tx("emp_details"), W / 2, y, { size: 18, bold: true, color: "#14232e", align: "center" });
     y += 10;
