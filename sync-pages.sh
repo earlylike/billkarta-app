@@ -11,6 +11,7 @@ mkdir -p "$OUT/frontpage" "$OUT/Work" "$OUT/forall" "$OUT/lib"
 patch_page () {
   sed -E \
     -e '/fonts\.(googleapis|gstatic)\.com/d' \
+    -e 's#name="viewport" content="width=device-width, initial-scale=1\.0, viewport-fit=cover"#name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"#' \
     -e 's#<head>#<head><script src="/assets/www/app-shim.js"></script><link rel="stylesheet" href="/assets/www/fonts/poppins.css">#' \
     -e 's#https://cdnjs\.cloudflare\.com/ajax/libs/jspdf/2\.5\.1/jspdf\.umd\.min\.js#/assets/www/lib/jspdf.umd.min.js#g' \
     -e 's#https://cdnjs\.cloudflare\.com/ajax/libs/jspdf-autotable/3\.5\.31/jspdf\.plugin\.autotable\.min\.js#/assets/www/lib/jspdf.plugin.autotable.min.js#g' \
