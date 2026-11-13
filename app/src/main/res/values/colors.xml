@@ -1,4 +1,5 @@
 <resources>
     <color name="app_background">#080A0E</color>
-    <color name="icon_background">#4338CA</color>
+    <color name="icon_background">#022A96</color>
+    <color name="splash_bg">#022A96</color>
 </resources>

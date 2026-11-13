@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Base64
 import android.view.WindowManager
@@ -18,10 +19,12 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
@@ -30,6 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private lateinit var outer: FrameLayout
+    private lateinit var splash: FrameLayout
+    private var splashStart = 0L
 
     private val fileChooser =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -57,6 +63,12 @@ class MainActivity : AppCompatActivity() {
         )
         setContentView(R.layout.activity_main)
         webView = findViewById(R.id.webview)
+        outer = findViewById(R.id.outer)
+        splash = findViewById(R.id.splash)
+        splashStart = SystemClock.uptimeMillis()
+        // Safety net: never keep the logo screen up for more than 4 seconds.
+        splash.postDelayed({ hideSplash() }, 4000)
+        if (savedInstanceState != null) finishSplashNow()
 
         // Keep content clear of the status bar and navigation bar.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { v, insets ->
@@ -88,6 +100,10 @@ class MainActivity : AppCompatActivity() {
             override fun shouldInterceptRequest(
                 view: WebView, request: WebResourceRequest
             ): WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
+
+            override fun onPageFinished(view: WebView, url: String) {
+                hideSplash()
+            }
 
             override fun shouldOverrideUrlLoading(
                 view: WebView, request: WebResourceRequest
@@ -135,6 +151,33 @@ class MainActivity : AppCompatActivity() {
         } else {
             webView.restoreState(savedInstanceState)
         }
+    }
+
+    /** Shows the logo for at least MIN_SPLASH_MS, then fades it out to reveal the first page. */
+    private fun hideSplash() {
+        if (splash.visibility != android.view.View.VISIBLE || splash.animation != null) return
+        val wait = (MIN_SPLASH_MS - (SystemClock.uptimeMillis() - splashStart)).coerceAtLeast(0)
+        splash.postDelayed({
+            if (splash.visibility != android.view.View.VISIBLE) return@postDelayed
+            applyAppBackground()
+            splash.animate().alpha(0f).setDuration(280).withEndAction {
+                splash.visibility = android.view.View.GONE
+            }.start()
+        }, wait)
+    }
+
+    private fun finishSplashNow() {
+        applyAppBackground()
+        splash.visibility = android.view.View.GONE
+    }
+
+    private fun applyAppBackground() {
+        val bg = ContextCompat.getColor(this, R.color.app_background)
+        outer.setBackgroundColor(bg)
+        @Suppress("DEPRECATION")
+        window.statusBarColor = bg
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = bg
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -204,6 +247,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val MIN_SPLASH_MS = 1000L
         private const val HOME_URL =
             "https://appassets.androidplatform.net/assets/www/frontpage/index.html"
     }
