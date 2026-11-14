@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -22,6 +23,8 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -55,6 +58,11 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Edge-to-edge with transparent bars and light icons (the app is dark); insets are handled below.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
         // Block screenshots, screen recording and the recent-apps preview of every page.
         window.setFlags(
@@ -174,10 +182,6 @@ class MainActivity : AppCompatActivity() {
     private fun applyAppBackground() {
         val bg = ContextCompat.getColor(this, R.color.app_background)
         outer.setBackgroundColor(bg)
-        @Suppress("DEPRECATION")
-        window.statusBarColor = bg
-        @Suppress("DEPRECATION")
-        window.navigationBarColor = bg
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
