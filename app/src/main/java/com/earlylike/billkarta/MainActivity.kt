@@ -3,7 +3,10 @@ package com.earlylike.billkarta
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import java.util.Locale
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -55,6 +58,15 @@ class MainActivity : AppCompatActivity() {
             filePathCallback?.onReceiveValue(uris)
             filePathCallback = null
         }
+
+    // Always show dates as dd/mm/yyyy (English-India) in the date pickers, whatever the phone's region is.
+    override fun attachBaseContext(newBase: Context) {
+        val locale = Locale("en", "IN")
+        Locale.setDefault(locale)
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
