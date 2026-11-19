@@ -35,6 +35,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Test build installs NEXT TO the Play Store app (different package + name, separate data)
+            applicationIdSuffix = ".test"
+            versionNameSuffix = "-test"
+        }
         release {
             isMinifyEnabled = false
             if (keystoreProps.containsKey("storeFile")) {

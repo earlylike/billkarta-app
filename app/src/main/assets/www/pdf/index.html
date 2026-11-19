@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>PDF Editor</title>
+<script src="/assets/www/app-shim.js"></script>
+<meta name="theme-color" content="#080a0e">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar">
+  <button id="backBtn" type="button" aria-label="Back" onclick="history.length>1?history.back():(location.href='../Work/index.html')">‹ Back</button>
+  <button id="openBtn" class="open"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg><span>Open PDF</span></button>
+  <input id="file" type="file" style="display:none">
+  <div class="seg" role="toolbar" aria-label="Editing tools">
+    <button data-tool="edit" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Edit text</span></button>
+    <button data-tool="text"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg><span>Add text</span></button>
+    
+    
+  </div>
+  <div class="style">
+    <label class="fld"><span>Size</span><input id="size" type="number" value="16" min="6" max="120"></label>
+    <input id="color" type="color" value="#000000" title="Text colour" aria-label="Text colour">
+  </div>
+  <div class="hist" role="group" aria-label="Undo and redo">
+    <button id="undoBtn" title="Undo (Ctrl Z)" aria-label="Undo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span></button>
+    <button id="redoBtn" title="Redo (Ctrl Y)" aria-label="Redo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg><span>Redo</span></button>
+  </div>
+  <button id="save" class="save"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><span>Save PDF</span></button>
+  <span id="hint"></span>
+</div>
+<div id="viewer">
+  <div id="stage"><div id="sizer"><div id="pages"><div id="empty"><div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg></div><b>Tap “Open PDF” to load a file.</b>Max 2 MB and 10 pages. Everything stays on your phone — nothing is uploaded.</div></div></div></div>
+  <div class="zoomctl" role="group" aria-label="Zoom PDF">
+    <button id="zOut" title="Zoom out (Ctrl −)" aria-label="Zoom out"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+    <button id="zPct" title="Reset zoom (Ctrl 0)">100%</button>
+    <button id="zIn" title="Zoom in (Ctrl +)" aria-label="Zoom in"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+  </div>
+</div>
+
+<div id="modal"><div class="card">
+  <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <h2>PDF saved successfully!</h2>
+  <p id="mName"></p><p id="mInfo"></p>
+  <div class="btns"><button id="mClose" class="primary">Close</button></div>
+</div></div>
+
+<script type="module" src="script.js"></script>
+
+<div id="bkToast" role="status" aria-live="polite"></div>
+<style>
+#backBtn{height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font:600 14px/1 system-ui,sans-serif;flex:none}
+#hint{flex:1 1 100% !important;order:9 !important;min-width:0}
+#bkToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);max-width:88vw;padding:12px 18px;border-radius:14px;background:#1b1e26;color:#fff;border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.5);font:500 14px/1.4 system-ui,sans-serif;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9999}
+#bkToast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+<script>
+/* WebView hides alert(); show a toast instead */
+window.alert = function (m) {
+  var t = document.getElementById('bkToast'); t.textContent = String(m); t.classList.add('show');
+  clearTimeout(window.__bkT); window.__bkT = setTimeout(function () { t.classList.remove('show'); }, 4200);
+};
+</script>
+</body>
+</html>
