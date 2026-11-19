@@ -17,12 +17,18 @@
   <div class="seg" role="toolbar" aria-label="Editing tools">
     <button data-tool="edit" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Edit text</span></button>
     <button data-tool="text"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg><span>Add text</span></button>
+    <button data-tool="draw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg><span>Draw</span></button>
     
     
   </div>
   <div class="style">
     <label class="fld"><span>Size</span><input id="size" type="number" value="16" min="6" max="120"></label>
-    <input id="color" type="color" value="#000000" title="Text colour" aria-label="Text colour">
+    <input id="color" type="color" value="#000000" title="Text / pencil colour" aria-label="Text / pencil colour">
+    <div class="pen" role="group" aria-label="Pencil size">
+      <button id="penMinus" title="Thinner pencil" aria-label="Decrease pencil size"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+      <div class="penview" title="Pencil size"><span class="dotbox"><i id="penDot"></i></span><b id="penVal">3</b></div>
+      <button id="penPlus" title="Thicker pencil" aria-label="Increase pencil size"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+    </div>
   </div>
   <div class="hist" role="group" aria-label="Undo and redo">
     <button id="undoBtn" title="Undo (Ctrl Z)" aria-label="Undo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span></button>
@@ -41,10 +47,10 @@
 </div>
 
 <div id="modal"><div class="card">
-  <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-  <h2>PDF saved successfully!</h2>
+  <div class="tick"><svg id="mIcon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <h2 id="mTitle">PDF saved successfully!</h2>
   <p id="mName"></p><p id="mInfo"></p>
-  <div class="btns"><button id="mClose" class="primary">Close</button></div>
+  <div class="btns"><button id="mOpen" class="primary" style="display:none">Open PDF</button><button id="mClose" class="primary">Close</button></div>
 </div></div>
 
 <script type="module" src="script.js"></script>

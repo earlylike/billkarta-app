@@ -45,8 +45,11 @@ function setTool(t) {
   tool = t;
   document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
   pagesEl.className = 'tool-' + t;
-  $('hint').textContent = { edit: 'Tap any existing text to edit it, press Enter when done', text: 'Tap on page to add text', white: 'Drag to cover text (hides it visually; the text stays in the file)',
-    hl: 'Drag to highlight', img: 'Click on page to place image' }[t];
+  $('hint').textContent = { edit: '', text: 'Tap on page to add text', white: 'Drag to cover text (hides it visually; the text stays in the file)',
+    hl: 'Drag to highlight', img: 'Click on page to place image',
+    draw: '' }[t];
+  document.body.classList.toggle('is-draw', t === 'draw');
+  if (t === 'draw') setPen(pen);
 }
 
 $('openBtn').onclick = () => $('file').click();
@@ -139,6 +142,8 @@ function attach(ov) {
       const rowFs = rowFontSize(pg, p0.x, p0.y);
       if (rowFs) $('size').value = Math.round(rowFs / S * 10) / 10;   // default = size of the row clicked; user can still change it
       addText(ov, pg, p0.x, p0.y, '', true);
+    } else if (tool === 'draw') {
+      if (ev.isPrimary && activePtrs.size <= 1 && !pinch) startStroke(ov, pg, ev, p0);
     } else if (tool === 'img') {
       if (!pendingImg) return alert('Choose an image first.');
       const im = new Image(); im.onload = () => {
@@ -158,6 +163,73 @@ function attach(ov) {
       document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
     }
   });
+}
+
+// ---------- pencil / free drawing ----------
+let pen = 3;                                   // pencil thickness in PDF points
+function setPen(v) {
+  pen = Math.min(40, Math.max(1, Math.round(v)));
+  $('penVal').textContent = pen;
+  const d = Math.min(26, Math.max(4, pen * S));
+  $('penDot').style.width = $('penDot').style.height = d + 'px';
+  $('penDot').style.background = $('color').value;
+  $('penMinus').disabled = pen <= 1; $('penPlus').disabled = pen >= 40;
+}
+$('penMinus').onclick = () => setPen(pen - 1);
+$('penPlus').onclick = () => setPen(pen + 1);
+$('color').addEventListener('input', () => { $('penDot').style.background = $('color').value; });
+
+function strokePath(p) {
+  const f = n => n.toFixed(1);
+  if (p.length === 1) return 'M' + f(p[0][0]) + ' ' + f(p[0][1]) + 'l0.01 0';          // a single tap = a dot
+  let d = 'M' + f(p[0][0]) + ' ' + f(p[0][1]);
+  for (let i = 1; i < p.length - 1; i++)
+    d += 'Q' + f(p[i][0]) + ' ' + f(p[i][1]) + ' ' + f((p[i][0] + p[i + 1][0]) / 2) + ' ' + f((p[i][1] + p[i + 1][1]) / 2);
+  const l = p[p.length - 1];
+  return d + 'L' + f(l[0]) + ' ' + f(l[1]);
+}
+
+// --- multi-finger guard: a second finger (pinch / pan) must never draw ---
+const activePtrs = new Set();
+let strokeCancel = null;
+document.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') activePtrs.add(e.pointerId); }, true);
+const dropPtr = e => activePtrs.delete(e.pointerId);
+document.addEventListener('pointerup', dropPtr, true);
+document.addEventListener('pointercancel', dropPtr, true);
+document.addEventListener('touchstart', e => { if (e.touches.length > 1 && strokeCancel) strokeCancel(); }, { capture: true, passive: true });
+document.addEventListener('touchend', e => { if (e.touches.length === 0) activePtrs.clear(); }, true);
+
+function startStroke(ov, pg, ev, p0) {
+  ev.preventDefault();
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'stroke');
+  const path = document.createElementNS(NS, 'path');
+  const color = $('color').value, width = pen * S;
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke', color); path.setAttribute('stroke-width', width);
+  path.setAttribute('stroke-linecap', 'round'); path.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(path); ov.appendChild(svg);
+  let shown = ev.pointerType !== 'touch';
+  if (!shown) svg.style.visibility = 'hidden';
+  const showTimer = shown ? 0 : setTimeout(() => { shown = true; svg.style.visibility = ''; }, 90);
+  const it = { kind: 'draw', page: pg, pts: [[p0.x, p0.y]], color, width, el: svg };
+  const render = () => path.setAttribute('d', strokePath(it.pts));
+  render();
+  const move = e => {
+    if (!e.isPrimary) return;
+    for (const c of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) {
+      const p = pos(ov, c), l = it.pts[it.pts.length - 1];
+      if (Math.hypot(p.x - l[0], p.y - l[1]) >= 0.6) it.pts.push([p.x, p.y]);
+    }
+    render();
+  };
+  const stop = () => { clearTimeout(showTimer); strokeCancel = null; document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up);
+    document.removeEventListener('pointercancel', cancel); document.removeEventListener('pointerdown', extra); };
+  const up = e => { if (!e.isPrimary) return; stop(); svg.style.visibility = ''; items.push(it); rec(() => detach(it), () => attachItem(it, ov)); };
+  const cancel = () => { stop(); svg.remove(); };
+  const extra = e => { if (!e.isPrimary) cancel(); };           // a second finger (pinch / pan) cancels the stroke
+  strokeCancel = cancel;
+  document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
+  document.addEventListener('pointercancel', cancel); document.addEventListener('pointerdown', extra);
 }
 
 function decorate(el, it, ov) {
@@ -278,8 +350,27 @@ function addText(ov, pg, x, y, text, focus) {
 
 function hexRGB(h) { const n = parseInt(h.slice(1), 16); return PDFLib.rgb((n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255); }
 
+const TICK = 'M5 12.5l4.5 4.5L19 7.5';
+const FOLDER = 'm6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2';
+function setModal(kind) {
+  const need = kind === 'need', m = $('modal');
+  m.classList.toggle('need', need);
+  $('mIcon').innerHTML = '<path d="' + (need ? FOLDER : TICK) + '"/>';
+  $('mTitle').textContent = need ? 'Open a PDF first' : 'PDF saved successfully!';
+  $('mName').textContent = need ? 'Please open a PDF file, then tap Save PDF.' : '';
+  $('mInfo').textContent = '';
+  $('mOpen').style.display = need ? '' : 'none';
+  $('mClose').classList.toggle('primary', !need);
+}
+function showModal(kind) {
+  setModal(kind);
+  $('modal').classList.remove('closing');
+  $('modal').classList.add('show');
+}
+$('mOpen').onclick = () => { closeModal(); $('file').click(); };
+
 $('save').onclick = async () => {
-  if (!pdfBytes) return alert('Open a PDF first.');
+  if (!pdfBytes) return showModal('need');
   try {
     const doc = await PDFLib.PDFDocument.load(pdfBytes, { ignoreEncryption: true });
     const font = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
@@ -303,6 +394,11 @@ $('save').onclick = async () => {
         const t = it.txt.innerText.replace(/\n+$/, ''); if (!t.trim()) continue;
         t.split('\n').forEach((line, i) => { const p = P(it, it.x, it.y + it.size * 1.03 + i * it.size * 1.2);
           page.drawText(safe(line), { x: p[0], y: p[1], size: it.size / S, font, color: hexRGB(it.color), rotate: rot(it) }); });
+      } else if (it.kind === 'draw') {
+        const col = hexRGB(it.color), th = it.width / S, pts = it.pts.map(p => P(it, p[0], p[1]));
+        if (pts.length === 1) page.drawCircle({ x: pts[0][0], y: pts[0][1], size: th / 2, color: col });
+        else for (let i = 1; i < pts.length; i++)
+          page.drawLine({ start: { x: pts[i - 1][0], y: pts[i - 1][1] }, end: { x: pts[i][0], y: pts[i][1] }, thickness: th, color: col, lineCap: PDFLib.LineCapStyle.Round });
       } else if (it.kind === 'white') {
         page.drawRectangle({ ...rect(it, it.x, it.y, it.w, it.h), color: WH });
       } else if (it.kind === 'hl') {
@@ -318,6 +414,7 @@ $('save').onclick = async () => {
     const dl = () => { const a = document.createElement('a'); a.href = url; a.download = fileName; a.click(); };
     dl();
     const changed = items.filter(i => i.kind !== 'edit' || i.el.innerText !== i.orig).length;
+    setModal('saved');
     $('mName').textContent = fileName;
     $('mInfo').textContent = changed + ' change' + (changed === 1 ? '' : 's') + ' applied · ' + (out.length / 1024).toFixed(0) + ' KB';
     $('modal').classList.remove('closing');

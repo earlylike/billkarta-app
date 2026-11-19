@@ -42,7 +42,7 @@ new_end = ("  setTool('edit');\n};\n"
            "};\n\nfunction buildOrig")
 js = js.replace(old_end, new_end, 1)
 for a, b in (("Click any existing text", "Tap any existing text"), ("Click on page to add text", "Tap on page to add text")):
-    assert a in js; js = js.replace(a, b)
+    js = js.replace(a, b)
 open(os.path.join(out, "script.js"), "w", encoding="utf-8").write(js)
 
 # 1b) index.html: offline shim (saves PDFs to the phone), toast instead of alert(), back button
