@@ -32,3 +32,4 @@ echo "Pages synced into $OUT"
 # PDF editor (needs a clone of earlylike/pdf next to the other three) and the front-page language button
 if [ -d "$SRC/pdf" ]; then python3 "$(dirname "$0")/tools/patch_pdf.py" "$OUT" "$SRC/pdf"; fi
 python3 "$(dirname "$0")/tools/patch_frontpage_lang.py" "$OUT"
+python3 "$(dirname "$0")/tools/patch_header.py" "$OUT"
