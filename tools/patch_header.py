@@ -59,10 +59,16 @@ CSS = """
   box-shadow:0 0 5px 1px rgba(255,255,255,.8);opacity:.15;animation:bkTwk var(--p,3s) ease-in-out var(--q,0s) infinite}
 @keyframes bkTwk{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:1;transform:scale(1.5)}}
 main,.wrap{margin-top:-.45rem !important}
-/* warm cream page background to match the gold header */
-:root{--bg:#fbf4e4 !important}
-body{background:linear-gradient(180deg,#fbf4e4 0%,#f7edd2 100%) fixed !important}
-@media (prefers-color-scheme:dark){:root{--bg:#14110a !important}body{background:linear-gradient(180deg,#17130b 0%,#0f0c07 100%) fixed !important}}
+/* same background as the front page: dark with faint diagonal gold words + glow */
+body{background:#080a0e !important}
+.bk-words{position:fixed;left:-35%;right:-35%;top:-25%;bottom:-25%;z-index:0;pointer-events:none;overflow:hidden;transform:rotate(-18deg);
+  display:flex;flex-direction:column;justify-content:center;gap:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em;
+  font-size:1.1rem;line-height:1.1;white-space:nowrap;color:rgba(218,177,91,.17);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%)}
+.bk-words .row{display:block}.bk-words .row:nth-child(3n+1){color:rgba(218,177,91,.2)}.bk-words .row:nth-child(3n+2){color:rgba(218,177,91,.12)}
+.bk-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(120% 60% at 100% 0%,rgba(218,160,40,.34),transparent 60%),radial-gradient(90% 50% at 0% 100%,rgba(218,160,40,.16),transparent 60%)}
+main,.wrap{position:relative;z-index:1}
 /* tabs: three equal-size buttons with icons and a sliding gold plate */
 .tabs,nav[role="tablist"]{position:sticky;display:flex !important;gap:.3rem !important;padding:.3rem !important;box-sizing:border-box;
   border-radius:20px;background:rgba(18,14,8,.9) !important;border:1px solid rgba(245,217,144,.30);
@@ -91,6 +97,11 @@ ICONS = {
 
 JS = """<script>/* BK-GOLD-HEADER */(function(){
 function init(){
+  (function(){var w=['Workers','Employees','Employers','Contractors','Managers','Labourers','Caterers'],h='';
+    for(var r=0;r<46;r++){var l='';for(var k=0;k<24;k++)l+=w[(r*3+k)%7]+' \\u2022 ';h+='<span class="row" style="margin-left:'+(-(r%4)*7)+'%">'+l+'</span>';}
+    var g=document.createElement('div');g.className='bk-glow';g.setAttribute('aria-hidden','true');
+    var d=document.createElement('div');d.className='bk-words';d.setAttribute('aria-hidden','true');d.innerHTML=h;
+    document.body.insertBefore(d,document.body.firstChild);document.body.insertBefore(g,document.body.firstChild);})();
   var nav=document.querySelector('nav.tabs,nav[role="tablist"]');if(!nav)return;
   var plate=document.createElement('span');plate.className='bk-plate';plate.setAttribute('aria-hidden','true');nav.insertBefore(plate,nav.firstChild);
   function place(){
@@ -109,10 +120,10 @@ function init(){
     var M={};
     function measure(){
       h1.style.transform='';var safe=parseFloat(getComputedStyle(probe).paddingTop)||0;
-      var BAR=safe+42,H=hero.offsetHeight,R=Math.max(1,H-BAR);
+      var BAR=38,H=hero.offsetHeight,R=Math.max(1,H-BAR);
       hero.style.top=(-R)+'px';nav.style.top=(BAR+6)+'px';
       var hr=hero.getBoundingClientRect(),ir=img.getBoundingClientRect(),sc=.8;
-      M={R:R,ty:safe+21-(ir.top-hr.top+ir.height/2)-0,tx:14-(ir.left),sc:sc,w:ir.width*sc,h:ir.height*sc,top:safe+21};
+      M={R:R,ty:19-(ir.top-hr.top+ir.height/2),tx:14-(ir.left),sc:sc,w:ir.width*sc,h:ir.height*sc,top:19};
       var hl=h1.getBoundingClientRect().left;M.tx=14-hl-(ir.left-hl)*sc;
       chip.style.width=(M.w+24)+'px';chip.style.height=(M.h+16)+'px';
       frame();
