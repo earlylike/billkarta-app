@@ -24,31 +24,25 @@ CSS = """
     radial-gradient(60% 90% at 2% 20%,rgba(198,156,80,.30),transparent 65%),
     linear-gradient(165deg,#0c0d12 0%,#2b2111 52%,#8a6420 100%);
   box-shadow:0 10px 26px rgba(184,137,53,.28);will-change:opacity,transform}
-.hero .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(18px);opacity:.8;width:150px;height:150px;right:6%;top:-40px;
+.hero .orb{position:absolute;border-radius:50%;pointer-events:none;opacity:.55;width:190px;height:150px;right:2%;top:-60px;
   background:radial-gradient(circle,#f5d990,transparent 68%)}
 .hero-in{position:relative;z-index:1;max-width:40rem;margin:0 auto;padding:.6rem .8rem !important;background:none !important;border:0 !important;box-shadow:none !important}
 .hero-in .glass{position:absolute;inset:0;z-index:0;border-radius:18px;overflow:hidden;pointer-events:none;
   background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.07));border:1px solid rgba(245,217,144,.38);
-  -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
-  box-shadow:0 12px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,235,190,.45);will-change:opacity,transform}
-.hero-in .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.30) 50%,transparent 62%) 220% 0/260% 100% no-repeat;animation:bkShine 6s ease-in-out 1.2s infinite}
-@keyframes bkShine{0%{background-position:220% 0}55%,100%{background-position:-120% 0}}
+  box-shadow:inset 0 1px 0 rgba(255,235,190,.45);will-change:opacity,transform}
 .bk-chip{position:absolute;z-index:0;left:0;top:0;border-radius:999px;pointer-events:none;opacity:0;background:rgba(18,14,8,.92);
   border:1px solid rgba(245,217,144,.35);box-shadow:0 6px 16px rgba(16,12,4,.3)}
 .hero h1.brand{position:relative;z-index:2;line-height:0;margin:0;transform-origin:left center;will-change:transform}
 .hero h1.brand img{display:block;margin:0 auto;height:24px !important;width:auto;max-width:68% !important;filter:drop-shadow(0 2px 10px rgba(40,10,60,.5))}
 .hero .cr{position:absolute;left:-24px;pointer-events:none;z-index:0;opacity:0;
-  filter:drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 0 7px rgba(255,200,120,.6));animation:bkCrR var(--t,16s) linear var(--d,0s) infinite}
+  animation:bkCrR var(--t,16s) linear var(--d,0s) infinite}
 .hero .cr.rev{left:auto;right:-24px;animation-name:bkCrL}
 .hero .cr i{display:block;width:calc(var(--s,10px)*.75);height:calc(var(--s,10px)*.75);position:relative;
   clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
   background:linear-gradient(125deg,#fff 0%,#fff1c2 50%,#fff 100%);animation:bkCrW var(--w,5s) ease-in-out var(--d,0s) infinite alternate}
-.hero .cr i::after{content:"";position:absolute;inset:0;background:#fff;animation:bkGlint var(--w,5s) ease-in-out infinite alternate}
 @keyframes bkCrR{0%{opacity:0;transform:translateX(0)}8%{opacity:1}92%{opacity:1}100%{opacity:0;transform:translateX(calc(100vw + 48px))}}
 @keyframes bkCrL{0%{opacity:0;transform:translateX(0)}8%{opacity:1}92%{opacity:1}100%{opacity:0;transform:translateX(calc(-100vw - 48px))}}
 @keyframes bkCrW{0%{transform:translateY(calc(var(--a,14px)*-1)) rotate(-18deg)}100%{transform:translateY(var(--a,14px)) rotate(18deg)}}
-@keyframes bkGlint{0%,100%{opacity:0}50%{opacity:.9}}
 .hero .k1{top:14px;--s:11px;--t:17s;--w:4.6s;--a:10px;--d:-2s}
 .hero .k2{top:34px;--s:8px;--t:21s;--w:5.8s;--a:8px;--d:-9s}
 .hero .k3{top:50px;--s:13px;--t:19s;--w:6.4s;--a:8px;--d:-5s}
@@ -56,15 +50,15 @@ CSS = """
 .hero .k5{top:44px;--s:7px;--t:15s;--w:4.2s;--a:7px;--d:-7s}
 .hero .k10{top:30px;--s:12px;--t:12s;--w:4.6s;--a:9px;--d:-3s}
 .hero .tw{position:absolute;width:var(--z,2px);height:var(--z,2px);border-radius:50%;pointer-events:none;z-index:0;background:#fff;
-  box-shadow:0 0 5px 1px rgba(255,255,255,.8);opacity:.15;animation:bkTwk var(--p,3s) ease-in-out var(--q,0s) infinite}
-@keyframes bkTwk{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:1;transform:scale(1.5)}}
+  opacity:.15;animation:bkTwk var(--p,3s) ease-in-out var(--q,0s) infinite}
+@keyframes bkTwk{0%,100%{opacity:.15}50%{opacity:1}}
 main,.wrap{margin-top:-.45rem !important}
 /* same background as the front page: dark with faint diagonal gold words + glow */
 body{background:#080a0e !important}
 .bk-words{position:fixed;left:-35%;right:-35%;top:-25%;bottom:-25%;z-index:0;pointer-events:none;overflow:hidden;transform:rotate(-18deg);
   display:flex;flex-direction:column;justify-content:center;gap:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em;
   font-size:1.1rem;line-height:1.1;white-space:nowrap;color:rgba(218,177,91,.17);
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%,#000 86%,transparent 100%)}
+  will-change:transform;contain:strict}
 .bk-words .row{display:block}.bk-words .row:nth-child(3n+1){color:rgba(218,177,91,.2)}.bk-words .row:nth-child(3n+2){color:rgba(218,177,91,.12)}
 .bk-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(120% 60% at 100% 0%,rgba(218,160,40,.34),transparent 60%),radial-gradient(90% 50% at 0% 100%,rgba(218,160,40,.16),transparent 60%)}
@@ -86,7 +80,7 @@ main,.wrap{position:relative;z-index:1}
 /* smooth content change when switching tabs (restarts each time a panel becomes visible) */
 main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,.8,.2,1)}
 @keyframes bkIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.hero .cr,.hero .tw,.glass::after{display:none}.bk-plate,main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.hero .cr,.hero .tw,.bk-plate,main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:none;transition:none}}
 """
 
 ICONS = {
@@ -98,7 +92,7 @@ ICONS = {
 JS = """<script>/* BK-GOLD-HEADER */(function(){
 function init(){
   (function(){var w=['Workers','Employees','Employers','Contractors','Managers','Labourers','Caterers'],h='';
-    for(var r=0;r<46;r++){var l='';for(var k=0;k<24;k++)l+=w[(r*3+k)%7]+' \\u2022 ';h+='<span class="row" style="margin-left:'+(-(r%4)*7)+'%">'+l+'</span>';}
+    for(var r=0;r<34;r++){var l='';for(var k=0;k<12;k++)l+=w[(r*3+k)%7]+' \\u2022 ';h+='<span class="row" style="margin-left:'+(-(r%4)*7)+'%">'+l+'</span>';}
     var g=document.createElement('div');g.className='bk-glow';g.setAttribute('aria-hidden','true');
     var d=document.createElement('div');d.className='bk-words';d.setAttribute('aria-hidden','true');d.innerHTML=h;
     document.body.insertBefore(d,document.body.firstChild);document.body.insertBefore(g,document.body.firstChild);})();
