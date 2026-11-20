@@ -588,5 +588,21 @@ body{flex-direction:column;gap:18px}
   label();
 })();
 </script>
+<script>/* BK-PRELOAD */
+(function(){
+  var urls=['../Work/index.html','../forall/index.html'],i=0,started=false;
+  function next(){
+    if(i>=urls.length)return;
+    var f=document.createElement('iframe');
+    f.setAttribute('aria-hidden','true');f.tabIndex=-1;f.src=urls[i++];
+    f.style.cssText='position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px;top:0';
+    f.onload=function(){setTimeout(next,600);};
+    document.body.appendChild(f);
+  }
+  function start(){if(started)return;started=true;setTimeout(next,500);}
+  function idle(){(window.requestIdleCallback?requestIdleCallback(start,{timeout:1500}):setTimeout(start,300));}
+  if(document.readyState==='complete')idle();else window.addEventListener('load',idle);
+})();
+</script>
 </body>
 </html>

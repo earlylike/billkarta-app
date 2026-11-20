@@ -376,6 +376,10 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
 .hero-in .glass{position:absolute;inset:0;z-index:0;border-radius:18px;overflow:hidden;pointer-events:none;
   background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.07));border:1px solid rgba(245,217,144,.38);
   box-shadow:inset 0 1px 0 rgba(255,235,190,.45);will-change:opacity,transform}
+.hero-in .glass::after{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;pointer-events:none;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.38),transparent);transform:translateX(-120%) skewX(-18deg);
+  animation:bkShine 6s ease-in-out 1.2s infinite;will-change:transform}
+@keyframes bkShine{0%{transform:translateX(-120%) skewX(-18deg)}45%,100%{transform:translateX(330%) skewX(-18deg)}}
 .bk-chip{position:absolute;z-index:0;left:0;top:0;border-radius:999px;pointer-events:none;opacity:0;background:rgba(18,14,8,.92);
   border:1px solid rgba(245,217,144,.35);box-shadow:0 6px 16px rgba(16,12,4,.3)}
 .hero h1.brand{position:relative;z-index:2;line-height:0;margin:0;transform-origin:left center;will-change:transform}
@@ -426,7 +430,7 @@ main,.wrap{position:relative;z-index:1}
 /* smooth content change when switching tabs (restarts each time a panel becomes visible) */
 main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,.8,.2,1)}
 @keyframes bkIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.hero .cr,.hero .tw,.bk-plate,main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.hero .cr,.hero .tw,.glass::after,.bk-plate,main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:none;transition:none}}
 </style></head>
 <body data-tab="duty">
 <div id="offline" role="alertdialog" aria-modal="true" aria-labelledby="offt" hidden>

@@ -33,3 +33,4 @@ echo "Pages synced into $OUT"
 if [ -d "$SRC/pdf" ]; then python3 "$(dirname "$0")/tools/patch_pdf.py" "$OUT" "$SRC/pdf"; fi
 python3 "$(dirname "$0")/tools/patch_frontpage_lang.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_header.py" "$OUT"
+python3 "$(dirname "$0")/tools/patch_preload.py" "$OUT"
