@@ -1,6 +1,6 @@
 # BillKarta Privacy Policy
 
-Last updated: 12 November 2026
+Last updated: 20 November 2026
 
 BillKarta is an app for recording work duties and creating bills.
 
@@ -13,6 +13,12 @@ Deleting the app or clearing its data removes them.
 
 **Files you create:** PDF bills and backup files are saved to your Downloads/BillKarta
 folder on your request. You control these files.
+
+**PDF editor:** If you use the PDF editor, the PDF you choose is opened and edited only on
+your phone. It is never uploaded or sent anywhere. The edited copy is saved to your
+Downloads/BillKarta folder on your request.
+
+**Language:** The language you choose is saved only on your phone, inside the app.
 
 **WhatsApp:** If you tap the WhatsApp button, the bill text is passed to the WhatsApp app
 on your phone. WhatsApp's own privacy policy applies from there.
