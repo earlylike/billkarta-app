@@ -35,6 +35,13 @@ JS = """<script>/* BK-COUNT */(function(){
   function init(){
     var a=wire('wl','who'),e=wire('ewl','ewho'),save=document.getElementById('save');
     if(save&&a)save.addEventListener('click',function(){setTimeout(a,0);a();});
+    /* the page can come back from the PDF editor with the ticks restored by the browser (no change event),
+       so also re-check on pageshow and with a very light timer while the page is visible */
+    function all(){if(a)a();if(e)e();}
+    window.addEventListener('pageshow',function(){all();setTimeout(all,150);});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)all();});
+    setInterval(function(){if(!document.hidden)all();},400);
+    all();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script>"""
