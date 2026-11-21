@@ -407,7 +407,12 @@ body{flex-direction:column;gap:18px}
 .bk-pi.on{background:rgba(218,177,91,.14);color:#f4d58d;font-weight:600}.bk-pi.on .bk-rd{border-color:#f4d58d;background:radial-gradient(circle,#f4d58d 45%,transparent 50%)}
 .bk-pb{margin-top:14px;width:100%;padding:12px;border:0;border-radius:14px;text-align:center;font:600 14px 'Poppins',system-ui,sans-serif;color:#1a1405;background:linear-gradient(135deg,#f5d990,#b88935);cursor:pointer}
 </style>
-</head>
+<style>/* BK-SHARE */
+.bk-share{position:fixed;top:12px;right:12px;z-index:20;width:29px;height:29px;padding:0;border-radius:50%;display:grid;place-items:center;
+  border:1px solid rgba(198,156,80,.6);background:rgba(8,10,14,.78);box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bk-share svg{width:12px;height:12px;fill:none;stroke:#f4d58d;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bk-share::after{content:"";position:absolute;inset:-8px}
+</style></head>
 
 <body>
 <div class="bg-glow" aria-hidden="true"></div><div class="bg-words" id="bgwords" aria-hidden="true"></div>
@@ -604,5 +609,14 @@ body{flex-direction:column;gap:18px}
   if(document.readyState==='complete')idle();else window.addEventListener('load',idle);
 })();
 </script>
+<button type="button" class="bk-share" id="bkShare" aria-label="Share BillKarta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
+<script>/* BK-SHARE */(function(){
+  var MSG='Try BillKarta, a free app to record work duties and make bills. It works offline: https://play.google.com/store/apps/details?id=com.earlylike.billkarta';
+  var b=document.getElementById('bkShare');if(!b)return;
+  b.addEventListener('click',function(){
+    try{if(window.AndroidBridge&&AndroidBridge.shareApp){AndroidBridge.shareApp(MSG);return;}}catch(e){}
+    try{if(navigator.share){navigator.share({text:MSG});return;}}catch(e){}
+  });
+})();</script>
 </body>
 </html>

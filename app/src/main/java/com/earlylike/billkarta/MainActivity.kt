@@ -215,6 +215,22 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread { Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show() }
         }
 
+        /** Opens the phone's share sheet with a ready message (used by the share icon on the first page). */
+        @JavascriptInterface
+        fun shareApp(text: String) {
+            runOnUiThread {
+                try {
+                    val send = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, text)
+                    }
+                    startActivity(Intent.createChooser(send, "Share BillKarta"))
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Could not open share", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         @JavascriptInterface
         fun saveFile(base64: String, fileName: String, mimeType: String) {
             try {
