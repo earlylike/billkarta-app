@@ -97,7 +97,7 @@
         else { cur = { p: it.p, y: it.y, its: [it] }; lines.push(cur); }
       });
       lines.forEach(function (l) { l.its.sort(function (a, b) { return a.x - b.x; }); });
-      var res = { name: null, duty: [], adv: [], final: null, any: false };
+      var res = { name: null, duty: [], adv: [], final: null, any: false, sum: {} };
       var f0 = lines[0], ft = f0 ? f0.its.map(function (z) { return z.t; }).join(" ").trim() : "";
       var nm = ft.match(/^Name\s*:\s*(.*)$/i);
       if (nm) res.name = nm[1].trim();
@@ -107,6 +107,13 @@
         var txt = l.its.map(function (z) { return z.t; }).join(" ");
         var fm = txt.match(/Final Payment\s*=\s*(-?)Rs\.\s?([\d,]+)/);
         if (fm) res.final = (fm[1] ? -1 : 1) * Number(fm[2].replace(/,/g, ""));
+        var N = function (x) { return Number(String(x).replace(/,/g, "")); }, tt = txt.trim(), q;
+        if ((q = tt.match(/^Half Days:\s*(\d+)\s*\(\s*\d+\s*x\s*Rs\.([\d,]+)\s*=\s*Rs\.([\d,]+)\s*\)/))) res.sum.hd = { n: N(q[1]), rt: N(q[2]), am: N(q[3]) };
+        else if ((q = tt.match(/^Full Days:\s*(\d+)\s*\(\s*\d+\s*x\s*Rs\.([\d,]+)\s*=\s*Rs\.([\d,]+)\s*\)/))) res.sum.fd = { n: N(q[1]), rt: N(q[2]), am: N(q[3]) };
+        else if ((q = tt.match(/^Total Payment:\s*(-?)Rs\.([\d,]+)/))) res.sum.gross = (q[1] ? -1 : 1) * N(q[2]);
+        else if ((q = tt.match(/^Advance:\s*-\s*Rs\.([\d,]+)/))) res.sum.adv = N(q[1]);
+        else if ((q = tt.match(/^(-?)Rs\.([\d,]+)\s*-\s*Rs\.([\d,]+)\s*=\s*(-?)Rs\.([\d,]+)/))) res.sum.sub = (q[4] ? -1 : 1) * N(q[5]);
+        else if ((q = tt.match(/^(-?)Rs\.([\d,]+)\s*\+\s*Rs\.([\d,]+)\s*\(/))) res.sum.pend = N(q[3]);
         var d0 = l.its[0], iso = d0 && d0.x < 90 ? cmpIso(d0.t.trim()) : null;
         if (!iso) return;
         var amt = null, half = 0, full = 0, loc = [];
@@ -155,6 +162,22 @@
     out.hAmt = out.hd * out.rh; out.fAmt = out.fd * out.rf;
     out.gross = out.hAmt + out.fAmt; out.sub = out.gross - out.dmAdv; out.pend = pend > 0 ? pend : 0; out.net = out.sub + out.pend;
     out.pdfFinal = pdf.final;
+    var S = pdf.sum || {}, ph = 0, pf = 0;
+    pdf.duty.forEach(function (x) { ph += x.h; pf += x.f; });
+    var M = pdfMoney;
+    function hl(n, rt, am) { return PS("Half Days") + ": " + n + "  (" + n + " x " + M(rt) + " = " + M(am) + ")"; }
+    function fl(n, rt, am) { return PS("Full Days") + ": " + n + "  (" + n + " x " + M(rt) + " = " + M(am) + ")"; }
+    var oh = S.hd || { n: ph, rt: out.rh, am: ph * out.rh }, of = S.fd || { n: pf, rt: out.rf, am: pf * out.rf };
+    var og = S.gross !== undefined ? S.gross : oh.am + of.am, oa = S.adv !== undefined ? S.adv : out.pdfAdv;
+    var os = S.sub !== undefined ? S.sub : og - oa, op = S.pend !== undefined ? S.pend : 0;
+    out.lines = [
+      { o: hl(oh.n, oh.rt, oh.am), n: hl(out.hd, out.rh, out.hAmt) },
+      { o: fl(of.n, of.rt, of.am), n: fl(out.fd, out.rf, out.fAmt) },
+      { o: PS("Total Payment") + ": " + M(og), n: PS("Total Payment") + ": " + M(out.gross) },
+      { o: PS("Advance") + ": - " + M(oa), n: PS("Advance") + ": - " + M(out.dmAdv) },
+      { o: M(og) + " - " + M(oa) + " = " + M(os), n: M(out.gross) + " - " + M(out.dmAdv) + " = " + M(out.sub) },
+      { o: M(os) + " + " + M(op) + " (" + PS("Pending payment") + ")", n: M(out.sub) + " + " + M(out.pend) + " (" + PS("Pending payment") + ")" }
+    ];
     return out;
   }
   function cmpMakePdf(emp, r) {
@@ -240,32 +263,32 @@
       y = doc.lastAutoTable.finalY + 10;
     }
     var diff = r.pdfFinal !== null && r.pdfFinal !== r.net;
-    var bh = diff ? 90 : 78;
+    var pos = [], yy = 11;
+    r.lines.forEach(function (L, i) { pos.push(yy); yy += (L.o !== L.n ? 8 : 0) + 9 + (i === 4 ? 1.5 : 0); });
+    var fpos = yy + 2, fnew = fpos + (diff ? 11 : 0), bh = fnew + 7;
     if (y + bh + 12 > 285) { doc.addPage(); y = 20; }
-    function line(str, x, yy, pt, bold, rgb) {
-      if (!pdfUni(str)) { doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(pt); doc.setTextColor(rgb[0], rgb[1], rgb[2]); doc.text(str, x, yy); return; }
+    function line(str, x, yy2, pt, bold, rgb) {
+      if (!pdfUni(str)) { doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(pt); doc.setTextColor(rgb[0], rgb[1], rgb[2]); doc.text(str, x, yy2); return doc.getTextWidth(str); }
       var hex = "#" + rgb.map(function (n) { return ("0" + n.toString(16)).slice(-2); }).join("");
       var im = pdfTextImg(str, W - 40, pt, hex, bold, "#ffffff", false);
-      doc.addImage(im.data, "PNG", x, yy - pt * 0.3528 * 1.05, im.w, im.h);
+      doc.addImage(im.data, "PNG", x, yy2 - pt * 0.3528 * 1.05, im.w, im.h);
+      var cv = document.createElement("canvas").getContext("2d"); cv.font = (bold ? "700 " : "400 ") + (pt * 0.3528 * 12) + "px " + FONT_FAMILY;
+      return Math.min(im.w, cv.measureText(str).width / 12);
+    }
+    function strike(str, x, yy2, pt) {
+      var wd = line(str, x, yy2, pt, false, [217, 48, 37]);
+      doc.setDrawColor(217, 48, 37); doc.setLineWidth(0.4); doc.line(x - 0.5, yy2 - pt * 0.12, x + wd + 0.5, yy2 - pt * 0.12); doc.setLineWidth(0.2);
     }
     line(tx("cmp_bill_h"), 14, y, 13, true, [30, 130, 89]);
     y += 4;
     doc.setDrawColor(15, 118, 110); doc.setLineWidth(0.6); doc.roundedRect(14, y, W - 28, bh, 3, 3, "S"); doc.setLineWidth(0.2);
     var ink = [23, 35, 59], teal = [15, 118, 110];
-    line(PS("Half Days") + ": " + r.hd + "  (" + r.hd + " x " + money(r.rh) + " = " + money(r.hAmt) + ")", 20, y + 11, 12, false, ink);
-    line(PS("Full Days") + ": " + r.fd + "  (" + r.fd + " x " + money(r.rf) + " = " + money(r.fAmt) + ")", 20, y + 20, 12, false, ink);
-    line(PS("Total Payment") + ": " + money(r.gross), 20, y + 29, 12, false, ink);
-    line(PS("Advance") + ": - " + money(r.dmAdv), 20, y + 38, 12, false, ink);
-    line(money(r.gross) + " - " + money(r.dmAdv) + " = " + money(r.sub), 20, y + 47, 12, false, ink);
-    line(money(r.sub) + " + " + money(r.pend) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);
-    var fy = y + 68;
-    if (diff) {
-      var ot = PS("Final Payment") + " = " + money(r.pdfFinal);
-      line(ot, 20, y + 68, 11, false, [217, 48, 37]);
-      doc.setDrawColor(217, 48, 37); doc.setLineWidth(0.4); doc.line(20, y + 66.7, 20 + doc.getTextWidth(ot) * 0.95, y + 66.7); doc.setLineWidth(0.2);
-      fy = y + 79;
-    }
-    line(PS("Final Payment") + " = " + money(r.net), 20, fy, 16, true, teal);
+    r.lines.forEach(function (L, i) {
+      if (L.o !== L.n) { strike(L.o, 20, y + pos[i], 11); line(L.n, 20, y + pos[i] + 8, 12, false, ink); }
+      else line(L.n, 20, y + pos[i], 12, false, ink);
+    });
+    if (diff) strike(PS("Final Payment") + " = " + money(r.pdfFinal), 20, y + fpos, 11);
+    line(PS("Final Payment") + " = " + money(r.net), 20, y + fnew, 16, true, teal);
     return doc;
   }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
