@@ -278,19 +278,20 @@
     function strike(str, x, yy2, pt) {
       var wd = line(str, x, yy2, pt, false, [217, 48, 37]);
       doc.setDrawColor(217, 48, 37); doc.setLineWidth(0.4); doc.line(x - 0.5, yy2 - pt * 0.12, x + wd + 0.5, yy2 - pt * 0.12); doc.setLineWidth(0.2);
+      return wd;
     }
     line(tx("cmp_bill_h"), 14, y, 13, true, [30, 130, 89]);
     y += 4;
     doc.setDrawColor(15, 118, 110); doc.setLineWidth(0.6); doc.roundedRect(14, y, W - 28, bh, 3, 3, "S"); doc.setLineWidth(0.2);
     var ink = [23, 35, 59], teal = [15, 118, 110];
     r.lines.forEach(function (L, i) {
-      var mx = W - 14 - 9;
-      if (L.o !== L.n) { strike(L.o, 20, y + pos[i], 11); mark(mx, y + pos[i] - 4, false); line(L.n, 20, y + pos[i] + 8, 12, false, ink); mark(mx, y + pos[i] + 4, true); }
-      else { line(L.n, 20, y + pos[i], 12, false, ink); mark(mx, y + pos[i] - 4, true); }
+      var wd;
+      if (L.o !== L.n) { wd = strike(L.o, 20, y + pos[i], 11); mark(20 + wd + 2.5, y + pos[i] - 4, false); wd = line(L.n, 20, y + pos[i] + 8, 12, false, ink); mark(20 + wd + 2.5, y + pos[i] + 4, true); }
+      else { wd = line(L.n, 20, y + pos[i], 12, false, ink); mark(20 + wd + 2.5, y + pos[i] - 4, true); }
     });
-    if (diff) { strike(PS("Final Payment") + " = " + money(r.pdfFinal), 20, y + fpos, 11); mark(W - 14 - 9, y + fpos - 4, false); }
-    line(PS("Final Payment") + " = " + money(r.net), 20, y + fnew, 16, true, teal);
-    mark(W - 14 - 9, y + fnew - 5, true);
+    if (diff) { var fw = strike(PS("Final Payment") + " = " + money(r.pdfFinal), 20, y + fpos, 11); mark(20 + fw + 2.5, y + fpos - 4, false); }
+    var fw2 = line(PS("Final Payment") + " = " + money(r.net), 20, y + fnew, 16, true, teal);
+    mark(20 + fw2 + 2.5, y + fnew - 5, true);
     return doc;
   }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
@@ -347,6 +348,7 @@
     $("cname").value = n; cmpHideList(); $("cname").blur();
     cmpBuf = null; $("cfname").textContent = ""; $("cmsg").textContent = ""; $("cmsg").className = "msg";
     $("cstep").hidden = !cmpEmp;
+    if (cmpEmp) $("cnote").textContent = tx("cmp_note", { emp: cmpEmp.name });
     if (cmpEmp) setTimeout(function () {
       var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       $("cmp").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });

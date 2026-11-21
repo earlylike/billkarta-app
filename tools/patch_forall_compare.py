@@ -21,6 +21,7 @@ CARD = '''
       <div id="cstep" hidden>
         <input type="file" id="cfile" accept="application/pdf,.pdf" hidden>
         <button class="btn save" id="cpick" type="button" data-i18n="cmp_choose">Choose PDF from phone</button>
+        <p class="hint" id="cnote" style="font-size:.78rem;margin:.45rem 0 0"></p>
         <p class="hint" id="cfname"></p>
         <div class="brow" style="margin-top:.8rem;align-items:center"><span class="bl"><label for="cpend" data-i18n="pending" style="margin:0">Pending payment</label><small style="display:block;opacity:.7" data-i18n="cmp_hint">Optional, added to the bill</small></span><span class="bv"><input type="number" id="cpend" class="pendin" min="0" step="any" inputmode="decimal" placeholder="0"></span></div>
         <button class="btn save" id="cgo" type="button" data-i18n="cmp_title">Compare PDF</button>
