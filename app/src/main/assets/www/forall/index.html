@@ -595,8 +595,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
 
 <div id="cmpsheet" hidden><div class="cmpbox" role="dialog" aria-modal="true" aria-labelledby="cmptitle">
   <div class="cmphd"><b id="cmptitle"></b><button type="button" id="cmpx" data-i18n-aria="cmp_close" aria-label="Close">&#10005;</button></div>
-  <div id="cmplist"></div>
-  <div id="cmpsum"></div>
+  <div id="cmpbody"><div id="cmplist"></div></div>
   <button class="btn save" id="cmpdl" type="button" data-i18n="cmp_dl">Download PDF</button>
 </div></div>
 <style>
@@ -604,17 +603,34 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
 #cmp{scroll-margin-top:96px}
 #cmpsheet{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 #cmpsheet[hidden]{display:none}
-.cmpbox{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:#fff;color:#17233b;border:1px solid #d5d9de;border-radius:16px 16px 0 0;padding:14px 14px 18px;box-sizing:border-box}
-.cmphd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:1.05rem}
+.cmpbox{width:100%;max-width:560px;height:92vh;display:flex;flex-direction:column;background:#e9ebef;color:#17233b;border-radius:16px 16px 0 0;padding:0 0 10px;box-sizing:border-box}
+.cmphd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:1.05rem;padding:12px 14px 6px}
 .cmphd button{background:none;border:none;color:#17233b;font-size:20px;padding:4px 8px;cursor:pointer}
-#cmplist{margin:10px 0}
-.cmph{font-weight:700;color:#1e8259;margin:10px 0 4px}
-.cmprow{display:grid;grid-template-columns:92px 1fr 26px;gap:6px;padding:7px 8px;border:1px solid #d5d9de;border-top:none;color:#17233b;font-size:.85rem;align-items:center}
-.cmprow.bad span:nth-child(1),.cmprow.bad span:nth-child(2){text-decoration:line-through;text-decoration-color:#d93025;text-decoration-thickness:2px}
-.cmprow.fix{background:rgba(30,130,89,.18)}
-#cmpsum{border-top:1px solid #d5d9de;margin-top:8px;padding-top:6px}
-.cmpsm{display:flex;justify-content:space-between;padding:3px 0;font-size:.95rem}
-.cmpsm.fin{color:#1e8259;font-size:1.05rem;font-weight:700}
+#cmpbody{flex:1;overflow:auto;padding:4px 8px 8px}
+.cmpbox>.btn{margin:4px 10px 0;width:auto}
+.cmppg{background:#fff;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#282828;box-shadow:0 0 0 1px #d5d9de}
+.cmpban{background:#4338ca;color:#fff;text-align:center;font-weight:700;font-size:16px;padding:16px 8px;overflow-wrap:anywhere}
+.cmpwrap{padding:12px 4px 14px 10px}
+.cmpr{display:grid;position:relative}
+.cmpr.d{grid-template-columns:minmax(0,22%) minmax(0,1fr) 13% 13% 26px}
+.cmpr.a{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 26px}
+.cmpr>div:not(.cmm){border:.5px solid #c8cdd2;padding:6px 5px;display:flex;align-items:center;background:#fff;overflow-wrap:anywhere}
+.cmpr>div.hd{background:#1e8259;color:#fff;font-weight:700;border-color:#1e8259;justify-content:center}
+.cmpr>.hl{justify-content:flex-start}
+.cmpr>.c{justify-content:center}
+.cmpr>.am{justify-content:flex-end}
+.cmpr>.cmm{display:flex;align-items:center;justify-content:center}
+.cmpr.bad::after{content:"";position:absolute;left:0;right:26px;top:50%;border-top:2px solid #d93025;pointer-events:none}
+.cmpr.fix>div:not(.cmm){background:#eaf3de;border-color:#97c459}
+.cmpr.tot>div:not(.cmm){background:#e7ecf3;font-weight:700}
+.cmpr.tot.fix>div:not(.cmm){background:#eaf3de}
+.cmk{width:15px;height:15px;border-radius:4px;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cmk.g{background:#1e8259}.cmk.x{background:#d93025}
+.cmph{margin:14px 0 6px;font-size:13px;color:#1e8259;font-weight:700}
+.cmpbill{border:1.5px solid #0f766e;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#17233b}
+.cmpl{display:flex;align-items:center;gap:6px;margin:0 0 7px;line-height:1.3}
+.cmpl.bad span:first-child{color:#d93025;text-decoration:line-through;font-size:11.5px}
+.cmpfinal{font-weight:700;color:#0f766e;font-size:15px}
 </style>
 
     <div class="card" id="details">
@@ -1907,6 +1923,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     mark(20 + fw2 + 2.5, y + fnew - 5, true);
     return doc;
   }
+  function fmtPdfDate(iso) { return pdfDate(iso); }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
   function cmpSum(label, val, strong) {
     var d = document.createElement("div"); d.className = "cmpsm" + (strong ? " fin" : "");
@@ -1919,19 +1936,35 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     var fname = (emp.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Employee") + "-corrected-" + today() + ".pdf";
     $("cmptitle").textContent = emp.name;
     var box = $("cmplist"); box.innerHTML = "";
-    function add(k, a, b) {
-      var d = document.createElement("div"); d.className = "cmprow " + k;
-      var s1 = document.createElement("span"), s2 = document.createElement("span"), s3 = document.createElement("span");
-      s1.textContent = a; s2.textContent = b; s3.textContent = k === "bad" ? "❌" : "✅";
-      d.appendChild(s1); d.appendChild(s2); d.appendChild(s3); box.appendChild(d);
+    function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; }
+    function mk(ok) { return el("span", "cmk " + (ok ? "g" : "x"), ok ? "\u2713" : "\u2715"); }
+    var pg = el("div", "cmppg");
+    pg.appendChild(el("div", "cmpban", PS("Name") + ": " + emp.name));
+    var wrap = el("div", "cmpwrap"); pg.appendChild(wrap);
+    function row(cls, cells, k, kind) {
+      var d = el("div", "cmpr " + cls + (k ? " " + k : "") );
+      cells.forEach(function (c) { var q = el("div", c[1] || "", c[0]); d.appendChild(q); });
+      var m = el("div", "cmm"); if (kind) m.appendChild(mk(kind === "ok")); d.appendChild(m);
+      wrap.appendChild(d);
     }
-    function head(t) { var h = document.createElement("div"); h.className = "cmph"; h.textContent = t; box.appendChild(h); }
-    head(tx("duty"));
-    r.duty.forEach(function (x) { add(x.k, fmt(x.date), (x.f ? tx("fd") : tx("hd")) + (x.loc ? " · " + x.loc : "")); });
-    if (r.adv.length) { head(tx("advance")); r.adv.forEach(function (x) { add(x.k, fmt(x.date), money(x.amount)); }); }
-    var sm = $("cmpsum"); sm.innerHTML = "";
-    sm.appendChild(cmpSum(tx("half_days"), String(r.hd))); sm.appendChild(cmpSum(tx("full_days"), String(r.fd)));
-    sm.appendChild(cmpSum(tx("pending"), money(r.pend))); sm.appendChild(cmpSum(tx("final_pay"), money(r.net), true));
+    row("d", [[PS("Date"), "hd hl"], [PS("Location/Work"), "hd hl"], [PS("Half Day"), "hd"], [PS("Full Day"), "hd"]], "", "");
+    r.duty.forEach(function (x) { row("d", [[fmtPdfDate(x.date)], [x.loc || "-"], [x.h ? "1" : "", "c"], [x.f ? "1" : "", "c"]], x.k, x.k === "bad" ? "bad" : "ok"); });
+    if (r.adv.length) {
+      wrap.appendChild(el("h4", "cmph", PS("Advance amount")));
+      row("a", [[PS("Date"), "hd hl"], [PS("Amount"), "hd am"]], "", "");
+      r.adv.forEach(function (x) { row("a", [[fmtPdfDate(x.date)], [money(x.amount), "am"]], x.k, x.k === "bad" ? "bad" : "ok"); });
+      if (r.pdfAdv !== r.dmAdv) {
+        row("a tot", [[PS("Total Advance")], [money(r.pdfAdv), "am"]], "bad", "bad");
+        row("a tot", [[PS("Total Advance")], [money(r.dmAdv), "am"]], "fix", "ok");
+      } else row("a tot", [[PS("Total Advance")], [money(r.dmAdv), "am"]], "ok", "ok");
+    }
+    wrap.appendChild(el("h4", "cmph", tx("cmp_bill_h")));
+    var bx = el("div", "cmpbill"); wrap.appendChild(bx);
+    function bl(txt, bad, cls) { var d = el("div", "cmpl" + (bad ? " bad" : "")); d.appendChild(el("span", cls || "", txt)); d.appendChild(mk(!bad)); bx.appendChild(d); }
+    r.lines.forEach(function (L) { if (L.o !== L.n) { bl(L.o, true); bl(L.n, false); } else bl(L.n, false); });
+    if (r.pdfFinal !== null && r.pdfFinal !== r.net) bl(PS("Final Payment") + " = " + money(r.pdfFinal), true);
+    bl(PS("Final Payment") + " = " + money(r.net), false, "cmpfinal");
+    box.appendChild(pg);
     var dl = $("cmpdl");
     dl.onclick = function () {
       var a = document.createElement("a"); a.href = cmpUrl; a.download = fname; a.textContent = "x";

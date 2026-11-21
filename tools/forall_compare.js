@@ -294,6 +294,7 @@
     mark(20 + fw2 + 2.5, y + fnew - 5, true);
     return doc;
   }
+  function fmtPdfDate(iso) { return pdfDate(iso); }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
   function cmpSum(label, val, strong) {
     var d = document.createElement("div"); d.className = "cmpsm" + (strong ? " fin" : "");
@@ -306,19 +307,35 @@
     var fname = (emp.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Employee") + "-corrected-" + today() + ".pdf";
     $("cmptitle").textContent = emp.name;
     var box = $("cmplist"); box.innerHTML = "";
-    function add(k, a, b) {
-      var d = document.createElement("div"); d.className = "cmprow " + k;
-      var s1 = document.createElement("span"), s2 = document.createElement("span"), s3 = document.createElement("span");
-      s1.textContent = a; s2.textContent = b; s3.textContent = k === "bad" ? "❌" : "✅";
-      d.appendChild(s1); d.appendChild(s2); d.appendChild(s3); box.appendChild(d);
+    function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; }
+    function mk(ok) { return el("span", "cmk " + (ok ? "g" : "x"), ok ? "\u2713" : "\u2715"); }
+    var pg = el("div", "cmppg");
+    pg.appendChild(el("div", "cmpban", PS("Name") + ": " + emp.name));
+    var wrap = el("div", "cmpwrap"); pg.appendChild(wrap);
+    function row(cls, cells, k, kind) {
+      var d = el("div", "cmpr " + cls + (k ? " " + k : "") );
+      cells.forEach(function (c) { var q = el("div", c[1] || "", c[0]); d.appendChild(q); });
+      var m = el("div", "cmm"); if (kind) m.appendChild(mk(kind === "ok")); d.appendChild(m);
+      wrap.appendChild(d);
     }
-    function head(t) { var h = document.createElement("div"); h.className = "cmph"; h.textContent = t; box.appendChild(h); }
-    head(tx("duty"));
-    r.duty.forEach(function (x) { add(x.k, fmt(x.date), (x.f ? tx("fd") : tx("hd")) + (x.loc ? " · " + x.loc : "")); });
-    if (r.adv.length) { head(tx("advance")); r.adv.forEach(function (x) { add(x.k, fmt(x.date), money(x.amount)); }); }
-    var sm = $("cmpsum"); sm.innerHTML = "";
-    sm.appendChild(cmpSum(tx("half_days"), String(r.hd))); sm.appendChild(cmpSum(tx("full_days"), String(r.fd)));
-    sm.appendChild(cmpSum(tx("pending"), money(r.pend))); sm.appendChild(cmpSum(tx("final_pay"), money(r.net), true));
+    row("d", [[PS("Date"), "hd hl"], [PS("Location/Work"), "hd hl"], [PS("Half Day"), "hd"], [PS("Full Day"), "hd"]], "", "");
+    r.duty.forEach(function (x) { row("d", [[fmtPdfDate(x.date)], [x.loc || "-"], [x.h ? "1" : "", "c"], [x.f ? "1" : "", "c"]], x.k, x.k === "bad" ? "bad" : "ok"); });
+    if (r.adv.length) {
+      wrap.appendChild(el("h4", "cmph", PS("Advance amount")));
+      row("a", [[PS("Date"), "hd hl"], [PS("Amount"), "hd am"]], "", "");
+      r.adv.forEach(function (x) { row("a", [[fmtPdfDate(x.date)], [money(x.amount), "am"]], x.k, x.k === "bad" ? "bad" : "ok"); });
+      if (r.pdfAdv !== r.dmAdv) {
+        row("a tot", [[PS("Total Advance")], [money(r.pdfAdv), "am"]], "bad", "bad");
+        row("a tot", [[PS("Total Advance")], [money(r.dmAdv), "am"]], "fix", "ok");
+      } else row("a tot", [[PS("Total Advance")], [money(r.dmAdv), "am"]], "ok", "ok");
+    }
+    wrap.appendChild(el("h4", "cmph", tx("cmp_bill_h")));
+    var bx = el("div", "cmpbill"); wrap.appendChild(bx);
+    function bl(txt, bad, cls) { var d = el("div", "cmpl" + (bad ? " bad" : "")); d.appendChild(el("span", cls || "", txt)); d.appendChild(mk(!bad)); bx.appendChild(d); }
+    r.lines.forEach(function (L) { if (L.o !== L.n) { bl(L.o, true); bl(L.n, false); } else bl(L.n, false); });
+    if (r.pdfFinal !== null && r.pdfFinal !== r.net) bl(PS("Final Payment") + " = " + money(r.pdfFinal), true);
+    bl(PS("Final Payment") + " = " + money(r.net), false, "cmpfinal");
+    box.appendChild(pg);
     var dl = $("cmpdl");
     dl.onclick = function () {
       var a = document.createElement("a"); a.href = cmpUrl; a.download = fname; a.textContent = "x";

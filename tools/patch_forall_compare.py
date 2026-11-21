@@ -32,8 +32,7 @@ CARD = '''
 SHEET = '''
 <div id="cmpsheet" hidden><div class="cmpbox" role="dialog" aria-modal="true" aria-labelledby="cmptitle">
   <div class="cmphd"><b id="cmptitle"></b><button type="button" id="cmpx" data-i18n-aria="cmp_close" aria-label="Close">&#10005;</button></div>
-  <div id="cmplist"></div>
-  <div id="cmpsum"></div>
+  <div id="cmpbody"><div id="cmplist"></div></div>
   <button class="btn save" id="cmpdl" type="button" data-i18n="cmp_dl">Download PDF</button>
 </div></div>
 <style>
@@ -41,17 +40,34 @@ SHEET = '''
 #cmp{scroll-margin-top:96px}
 #cmpsheet{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 #cmpsheet[hidden]{display:none}
-.cmpbox{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:#fff;color:#17233b;border:1px solid #d5d9de;border-radius:16px 16px 0 0;padding:14px 14px 18px;box-sizing:border-box}
-.cmphd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:1.05rem}
+.cmpbox{width:100%;max-width:560px;height:92vh;display:flex;flex-direction:column;background:#e9ebef;color:#17233b;border-radius:16px 16px 0 0;padding:0 0 10px;box-sizing:border-box}
+.cmphd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:1.05rem;padding:12px 14px 6px}
 .cmphd button{background:none;border:none;color:#17233b;font-size:20px;padding:4px 8px;cursor:pointer}
-#cmplist{margin:10px 0}
-.cmph{font-weight:700;color:#1e8259;margin:10px 0 4px}
-.cmprow{display:grid;grid-template-columns:92px 1fr 26px;gap:6px;padding:7px 8px;border:1px solid #d5d9de;border-top:none;color:#17233b;font-size:.85rem;align-items:center}
-.cmprow.bad span:nth-child(1),.cmprow.bad span:nth-child(2){text-decoration:line-through;text-decoration-color:#d93025;text-decoration-thickness:2px}
-.cmprow.fix{background:rgba(30,130,89,.18)}
-#cmpsum{border-top:1px solid #d5d9de;margin-top:8px;padding-top:6px}
-.cmpsm{display:flex;justify-content:space-between;padding:3px 0;font-size:.95rem}
-.cmpsm.fin{color:#1e8259;font-size:1.05rem;font-weight:700}
+#cmpbody{flex:1;overflow:auto;padding:4px 8px 8px}
+.cmpbox>.btn{margin:4px 10px 0;width:auto}
+.cmppg{background:#fff;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#282828;box-shadow:0 0 0 1px #d5d9de}
+.cmpban{background:#4338ca;color:#fff;text-align:center;font-weight:700;font-size:16px;padding:16px 8px;overflow-wrap:anywhere}
+.cmpwrap{padding:12px 4px 14px 10px}
+.cmpr{display:grid;position:relative}
+.cmpr.d{grid-template-columns:minmax(0,22%) minmax(0,1fr) 13% 13% 26px}
+.cmpr.a{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 26px}
+.cmpr>div:not(.cmm){border:.5px solid #c8cdd2;padding:6px 5px;display:flex;align-items:center;background:#fff;overflow-wrap:anywhere}
+.cmpr>div.hd{background:#1e8259;color:#fff;font-weight:700;border-color:#1e8259;justify-content:center}
+.cmpr>.hl{justify-content:flex-start}
+.cmpr>.c{justify-content:center}
+.cmpr>.am{justify-content:flex-end}
+.cmpr>.cmm{display:flex;align-items:center;justify-content:center}
+.cmpr.bad::after{content:"";position:absolute;left:0;right:26px;top:50%;border-top:2px solid #d93025;pointer-events:none}
+.cmpr.fix>div:not(.cmm){background:#eaf3de;border-color:#97c459}
+.cmpr.tot>div:not(.cmm){background:#e7ecf3;font-weight:700}
+.cmpr.tot.fix>div:not(.cmm){background:#eaf3de}
+.cmk{width:15px;height:15px;border-radius:4px;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cmk.g{background:#1e8259}.cmk.x{background:#d93025}
+.cmph{margin:14px 0 6px;font-size:13px;color:#1e8259;font-weight:700}
+.cmpbill{border:1.5px solid #0f766e;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#17233b}
+.cmpl{display:flex;align-items:center;gap:6px;margin:0 0 7px;line-height:1.3}
+.cmpl.bad span:first-child{color:#d93025;text-decoration:line-through;font-size:11.5px}
+.cmpfinal{font-weight:700;color:#0f766e;font-size:15px}
 </style>
 '''
 a = s.index('    <div class="card" id="details">')
