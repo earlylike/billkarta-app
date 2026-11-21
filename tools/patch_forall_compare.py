@@ -37,6 +37,7 @@ SHEET = '''
 </div></div>
 <style>
 #bill.card,#cmp.card{--tint:#fdf1c2}
+#cmp{scroll-margin-top:96px}
 #cmpsheet{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 #cmpsheet[hidden]{display:none}
 .cmpbox{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:#fff;color:#17233b;border:1px solid #d5d9de;border-radius:16px 16px 0 0;padding:14px 14px 18px;box-sizing:border-box}

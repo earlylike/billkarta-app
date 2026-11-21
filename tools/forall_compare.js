@@ -284,11 +284,13 @@
     doc.setDrawColor(15, 118, 110); doc.setLineWidth(0.6); doc.roundedRect(14, y, W - 28, bh, 3, 3, "S"); doc.setLineWidth(0.2);
     var ink = [23, 35, 59], teal = [15, 118, 110];
     r.lines.forEach(function (L, i) {
-      if (L.o !== L.n) { strike(L.o, 20, y + pos[i], 11); line(L.n, 20, y + pos[i] + 8, 12, false, ink); }
-      else line(L.n, 20, y + pos[i], 12, false, ink);
+      var mx = W - 14 - 9;
+      if (L.o !== L.n) { strike(L.o, 20, y + pos[i], 11); mark(mx, y + pos[i] - 4, false); line(L.n, 20, y + pos[i] + 8, 12, false, ink); mark(mx, y + pos[i] + 4, true); }
+      else { line(L.n, 20, y + pos[i], 12, false, ink); mark(mx, y + pos[i] - 4, true); }
     });
-    if (diff) strike(PS("Final Payment") + " = " + money(r.pdfFinal), 20, y + fpos, 11);
+    if (diff) { strike(PS("Final Payment") + " = " + money(r.pdfFinal), 20, y + fpos, 11); mark(W - 14 - 9, y + fpos - 4, false); }
     line(PS("Final Payment") + " = " + money(r.net), 20, y + fnew, 16, true, teal);
+    mark(W - 14 - 9, y + fnew - 5, true);
     return doc;
   }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
@@ -345,6 +347,10 @@
     $("cname").value = n; cmpHideList(); $("cname").blur();
     cmpBuf = null; $("cfname").textContent = ""; $("cmsg").textContent = ""; $("cmsg").className = "msg";
     $("cstep").hidden = !cmpEmp;
+    if (cmpEmp) setTimeout(function () {
+      var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      $("cmp").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
+    }, 220);
   }
   $("cname").addEventListener("input", function () { cmpEmp = null; cmpBuf = null; $("cstep").hidden = true; $("cmsg").textContent = ""; cmpList(); });
   $("cname").addEventListener("focus", cmpList);
