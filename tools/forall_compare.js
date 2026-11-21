@@ -122,7 +122,7 @@
       return res;
     });
   }
-  function cmpCompare(emp, pdf) {
+  function cmpCompare(emp, pdf, pend) {
     var dmDuty = state.records.filter(function (r) { return r.names.indexOf(emp.name) >= 0; })
       .map(function (r) { return { date: r.date, h: r.duty === "Half" ? 1 : 0, f: r.duty === "Full" ? 1 : 0, loc: r.loc || "" }; });
     var dmAdv = state.advances.filter(function (a) { return a.empId === emp.id; }).map(function (a) { return { date: a.date, amount: a.amount }; });
@@ -153,7 +153,7 @@
     out.hd = dmDuty.filter(function (r) { return r.h; }).length; out.fd = dmDuty.filter(function (r) { return r.f; }).length;
     out.rh = rateOf(emp, "Half"); out.rf = rateOf(emp, "Full");
     out.hAmt = out.hd * out.rh; out.fAmt = out.fd * out.rf;
-    out.gross = out.hAmt + out.fAmt; out.sub = out.gross - out.dmAdv; out.net = out.sub;
+    out.gross = out.hAmt + out.fAmt; out.sub = out.gross - out.dmAdv; out.pend = pend > 0 ? pend : 0; out.net = out.sub + out.pend;
     out.pdfFinal = pdf.final;
     return out;
   }
@@ -248,7 +248,7 @@
       var im = pdfTextImg(str, W - 40, pt, hex, bold, "#ffffff", false);
       doc.addImage(im.data, "PNG", x, yy - pt * 0.3528 * 1.05, im.w, im.h);
     }
-    line("Correct bill (from your records)", 14, y, 13, true, [30, 130, 89]);
+    line(tx("cmp_bill_h"), 14, y, 13, true, [30, 130, 89]);
     y += 4;
     doc.setDrawColor(15, 118, 110); doc.setLineWidth(0.6); doc.roundedRect(14, y, W - 28, bh, 3, 3, "S"); doc.setLineWidth(0.2);
     var ink = [23, 35, 59], teal = [15, 118, 110];
@@ -257,7 +257,7 @@
     line(PS("Total Payment") + ": " + money(r.gross), 20, y + 29, 12, false, ink);
     line(PS("Advance") + ": - " + money(r.dmAdv), 20, y + 38, 12, false, ink);
     line(money(r.gross) + " - " + money(r.dmAdv) + " = " + money(r.sub), 20, y + 47, 12, false, ink);
-    line(money(r.sub) + " + " + money(0) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);
+    line(money(r.sub) + " + " + money(r.pend) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);
     var fy = y + 68;
     if (diff) {
       var ot = PS("Final Payment") + " = " + money(r.pdfFinal);
@@ -269,13 +269,16 @@
     return doc;
   }
   function cmpHide() { $("cmpsheet").hidden = true; document.body.style.overflow = ""; }
+  function cmpSum(label, val, strong) {
+    var d = document.createElement("div"); d.className = "cmpsm" + (strong ? " fin" : "");
+    var a = document.createElement("span"), b = document.createElement("b"); a.textContent = label; b.textContent = val; d.appendChild(a); d.appendChild(b); return d;
+  }
   function cmpShow(emp, r, doc) {
     var buf = doc.output("arraybuffer"), blob = new Blob([buf], { type: "application/pdf" });
     if (cmpUrl) URL.revokeObjectURL(cmpUrl);
     cmpUrl = URL.createObjectURL(blob);
     var fname = (emp.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Employee") + "-corrected-" + today() + ".pdf";
     $("cmptitle").textContent = emp.name;
-    $("cmpsub").textContent = r.good + " correct, " + r.bad + " wrong or missing";
     var box = $("cmplist"); box.innerHTML = "";
     function add(k, a, b) {
       var d = document.createElement("div"); d.className = "cmprow " + k;
@@ -284,10 +287,12 @@
       d.appendChild(s1); d.appendChild(s2); d.appendChild(s3); box.appendChild(d);
     }
     function head(t) { var h = document.createElement("div"); h.className = "cmph"; h.textContent = t; box.appendChild(h); }
-    head("Duty");
-    r.duty.forEach(function (x) { add(x.k, fmt(x.date), (x.f ? "Full" : "Half") + (x.loc ? " · " + x.loc : "")); });
-    if (r.adv.length) { head("Advance"); r.adv.forEach(function (x) { add(x.k, fmt(x.date), money(x.amount)); }); }
-    $("cmpfinal").textContent = "Final Payment from your records: " + money(r.net);
+    head(tx("duty"));
+    r.duty.forEach(function (x) { add(x.k, fmt(x.date), (x.f ? tx("fd") : tx("hd")) + (x.loc ? " · " + x.loc : "")); });
+    if (r.adv.length) { head(tx("advance")); r.adv.forEach(function (x) { add(x.k, fmt(x.date), money(x.amount)); }); }
+    var sm = $("cmpsum"); sm.innerHTML = "";
+    sm.appendChild(cmpSum(tx("half_days"), String(r.hd))); sm.appendChild(cmpSum(tx("full_days"), String(r.fd)));
+    sm.appendChild(cmpSum(tx("pending"), money(r.pend))); sm.appendChild(cmpSum(tx("final_pay"), money(r.net), true));
     var dl = $("cmpdl");
     dl.onclick = function () {
       var a = document.createElement("a"); a.href = cmpUrl; a.download = fname; a.textContent = "x";
@@ -326,26 +331,26 @@
     var f = this.files && this.files[0], msg = $("cmsg");
     msg.textContent = ""; msg.className = "msg";
     if (!f) return;
-    if (f.size > 10 * 1024 * 1024) { cmpBuf = null; $("cfname").textContent = ""; return say(msg, "This PDF is too big. Use a PDF made by BillKarta.", true); }
+    if (f.size > 10 * 1024 * 1024) { cmpBuf = null; $("cfname").textContent = ""; return say(msg, tx("cmp_unread"), true); }
     var rd = new FileReader();
-    rd.onerror = function () { cmpBuf = null; say(msg, "Couldn't read that file. Try again.", true); };
+    rd.onerror = function () { cmpBuf = null; say(msg, tx("cmp_read_err"), true); };
     rd.onload = function () { cmpBuf = rd.result; $("cfname").textContent = f.name; };
     rd.readAsArrayBuffer(f);
   };
   $("cgo").onclick = function () {
     var msg = $("cmsg"); msg.textContent = ""; msg.className = "msg";
-    if (!cmpEmp) return say(msg, "Select an employee first.", true);
-    if (!cmpBuf) return say(msg, "Choose a PDF first.", true);
+    if (!cmpEmp) return say(msg, tx("cmp_pick_emp"), true);
+    if (!cmpBuf) return say(msg, tx("cmp_pick_pdf"), true);
     if (!window.jspdf || !window.jspdf.jsPDF || !window.jspdf.jsPDF.API.autoTable) return say(msg, tx("pdf_nolib"), true);
     if (typeof DecompressionStream === "undefined") { /* very old WebView: plain PDFs still work */ window.DecompressionStream = undefined; }
     cmpRead(cmpBuf).then(function (pdf) {
-      if (!pdf || !pdf.any) return say(msg, "Couldn't read duties or advances in this PDF. Use a PDF made by BillKarta.", true);
+      if (!pdf || !pdf.any) return say(msg, tx("cmp_unread"), true);
       var norm = function (s) { return String(s).toLowerCase().replace(/\s+/g, " ").trim(); };
-      if (pdf.name && norm(pdf.name) !== norm(cmpEmp.name)) return say(msg, "This PDF is for “" + pdf.name + "”, not “" + cmpEmp.name + "”. Choose the right PDF.", true);
-      var r = cmpCompare(cmpEmp, pdf), doc = cmpMakePdf(cmpEmp, r);
+      if (pdf.name && norm(pdf.name) !== norm(cmpEmp.name)) return say(msg, tx("cmp_wrong", { pdf: pdf.name, emp: cmpEmp.name }), true);
+      var pv = Number($("cpend").value); var r = cmpCompare(cmpEmp, pdf, isNaN(pv) ? 0 : pv), doc = cmpMakePdf(cmpEmp, r);
       cmpShow(cmpEmp, r, doc);
-      if (!pdf.name) say(msg, "The name in this PDF couldn't be read, so it was compared with " + cmpEmp.name + ".");
-    }).catch(function () { say(msg, "Couldn't compare this PDF. Use a PDF made by BillKarta.", true); });
+      if (!pdf.name) say(msg, tx("cmp_noname", { emp: cmpEmp.name }));
+    }).catch(function () { say(msg, tx("cmp_unread"), true); });
   };
   $("cmpx").onclick = cmpHide;
   $("cmpsheet").onclick = function (e) { if (e.target === $("cmpsheet")) cmpHide(); };
