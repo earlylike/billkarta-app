@@ -1485,6 +1485,34 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
       y += h;
     });
     y += 8;
+    if (b.advRows && b.advRows.length) {
+      var ahead = function () {
+        doc.setFillColor(26, 127, 86); doc.rect(M, y, tw, 9, "F");
+        put(doc, tx("date"), M + 2, y + 6, { size: 10, bold: true, color: "#ffffff" });
+        put(doc, tx("amount"), M + tw - 2, y + 6, { size: 10, bold: true, color: "#ffffff", align: "right" });
+        y += 9;
+        doc.setFont("helvetica", "normal"); doc.setTextColor(30, 30, 30); doc.setDrawColor(170, 180, 175);
+      };
+      if (y + 30 > H - 20) { doc.addPage(); y = 20; }
+      put(doc, tx("advance"), M, y, { size: 13, bold: true, color: "#1e8259" });
+      y += 3;
+      ahead();
+      var advSum = 0;
+      b.advRows.forEach(function (a) {
+        if (y + 8 > H - 20) { doc.addPage(); y = 20; ahead(); }
+        advSum += a.amount;
+        doc.rect(M, y, tw / 2, 8); doc.rect(M + tw / 2, y, tw / 2, 8);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(30, 30, 30);
+        doc.text(fmt(a.date), M + 2, y + 5.5);
+        put(doc, money(a.amount), M + tw - 2, y + 5.5, { size: 10, color: "#1e1e1e", align: "right" });
+        y += 8;
+      });
+      if (y + 9 > H - 20) { doc.addPage(); y = 20; ahead(); }
+      doc.setFillColor(231, 236, 243); doc.setDrawColor(170, 180, 175); doc.rect(M, y, tw, 9, "FD");
+      put(doc, tx("total"), M + 2, y + 6, { size: 10, bold: true, color: "#282828" });
+      put(doc, money(advSum), M + tw - 2, y + 6, { size: 10, bold: true, color: "#282828", align: "right" });
+      y += 9 + 8;
+    }
     var gross = b.hAmt + b.fAmt;
     var items = [[tx("half_days"), b.hd + " \u00d7 " + money(b.rh) + " = " + money(b.hAmt)],
                  [tx("full_days"), b.fd + " \u00d7 " + money(b.rf) + " = " + money(b.fAmt)]];
@@ -1645,7 +1673,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     var emp = state.employees.filter(function (x) { return x.name === billName; })[0];
     var pend = pendAmt;
     var adv = emp ? advTotal(emp.id) : 0, gross = hAmt + fAmt, sub = gross - adv, net = sub + pend;
-    billData = { name: billName, rows: rows, hd: hd, fd: fd, rh: rh, rf: rf, hAmt: hAmt, fAmt: fAmt, adv: adv, sub: sub, pend: pend, net: net };
+    billData = { /* BK-EMP-ADV-PDF */ advRows: (emp ? state.advances.filter(function (a) { return a.empId === emp.id; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }) : []), name: billName, rows: rows, hd: hd, fd: fd, rh: rh, rf: rf, hAmt: hAmt, fAmt: fAmt, adv: adv, sub: sub, pend: pend, net: net };
     var summary = '<div class="bsum">' +
       brow(tx("half_days"), '<b>' + hd + ' × ' + money(rh) + ' = ' + money(hAmt) + '</b>') +
       brow(tx("full_days"), '<b>' + fd + ' × ' + money(rf) + ' = ' + money(fAmt) + '</b>') +
