@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""App-only: adds BillKarta Pad (the notepad page from the earlylike/notepad repo) as a third card on the front page.
+"""App-only: adds BillKarta Pad (the notepad page from the earlylike/notepad repo, shown as "My Notes") as a third card on the front page.
 sync-pages.sh copies the page to assets/www/notepad; this script adds the card and locks the zoom like the other pages.
 Usage: patch_pad.py <assets/www folder>   (idempotent)"""
 import os, sys
@@ -16,10 +16,10 @@ if MARK not in s:
     assert s.count(anchor) == 1
     card = '''        </button>
 
-        <button type="button" class="tab" aria-pressed="false" data-name="BillKarta Pad" data-url="../notepad/index.html"><!-- BK-PAD-CARD -->
+        <button type="button" class="tab" aria-pressed="false" data-name="My Notes" data-url="../notepad/index.html"><!-- BK-PAD-CARD -->
             <div class="tab-icon" aria-hidden="true">🗒️</div>
             <div class="tab-info">
-                <h3>BillKarta Pad</h3>
+                <h3>My Notes</h3>
                 <p>Quick notes, saved on your phone</p>
             </div>
             <div class="arrow" aria-hidden="true">›</div>
