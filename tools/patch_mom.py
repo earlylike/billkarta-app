@@ -45,7 +45,14 @@ s = s[:i] + '''  function mgrTotal() {
     [].forEach.call(document.querySelectorAll("#who input[data-emp]"), function (x) { var n = Math.floor(Number(x.value)); if (n > 0) t += n; });
     return t;
   }
-  function mgrSum() { var e = $("mtot"); if (e) e.textContent = String(mgrTotal()); }
+  function mgrSum() {
+    var e = $("mtot"); if (e) e.textContent = String(mgrTotal());
+    [].forEach.call(document.querySelectorAll("#who .mrow"), function (r) { var i = r.querySelector("input"); r.classList.toggle("z", !(Math.floor(Number(i.value)) > 0)); });
+  }
+  function mgrFocus(row) {
+    [].forEach.call(document.querySelectorAll("#who .mrow.on"), function (r) { if (r !== row) r.classList.remove("on"); });
+    if (row) row.classList.add("on");
+  }
   function renderWho() {
     var box = $("who"); box.innerHTML = ""; box.className = "mgr";
     $("nowho").hidden = state.employees.length > 0;
@@ -57,19 +64,19 @@ s = s[:i] + '''  function mgrTotal() {
       box.appendChild(d);
     });
     if (state.employees.length) {
-      var t = document.createElement("div"); t.className = "mtot"; t.innerHTML = '<span>Total labourers today</span><b id="mtot">0</b>';
+      var t = document.createElement("div"); t.className = "mtot"; t.innerHTML = '<span>Total Employees</span><b id="mtot" class="mcount">0</b>';
       box.appendChild(t);
     }
-    updateSave();
+    mgrSum(); updateSave();
   }
 ''' + s[j:]
 rep('document.querySelectorAll("#who input:checked").length > 0;', 'mgrTotal() > 0;')
 rep('$("who").addEventListener("change", updateSave);', '''$("who").addEventListener("change", function () { mgrSum(); updateSave(); });
-  $("who").addEventListener("input", function () { mgrSum(); updateSave(); });
+  $("who").addEventListener("input", function () { mgrFocus(document.activeElement && document.activeElement.closest ? document.activeElement.closest(".mrow") : null); mgrSum(); updateSave(); });
   $("who").addEventListener("click", function (ev) {
     var b = ev.target.closest ? ev.target.closest(".mb") : null; if (!b) return;
     var inp = b.parentNode.querySelector("input"), v = Math.floor(Number(inp.value)) || 0;
-    v = Math.max(0, Math.min(9999, v + Number(b.getAttribute("data-d")))); inp.value = String(v); mgrSum(); updateSave();
+    v = Math.max(0, Math.min(9999, v + Number(b.getAttribute("data-d")))); inp.value = String(v); mgrFocus(b.closest(".mrow")); mgrSum(); updateSave();
   });''')
 i = s.index('  $("save").onclick = function () {'); j = s.index("  // Records\n", i)
 s = s[:i] + '''  $("save").onclick = function () {
@@ -104,7 +111,7 @@ rep('$("emodal").hidden = false; $("edate").focus();', '$("ecnt").value = String
 rep('r.duty = dt ? dt.value : r.duty; r.names = names;', 'r.duty = dt ? dt.value : r.duty; r.names = names; r.cnt = Math.max(1, Math.min(9999, Math.floor(Number($("ecnt").value)) || 1));')
 # wording (English) and styles
 rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KEY = "momlog.lang", lang = "en", memLang = null;
-  Object.assign(I18N.en, { who: "Managers and their labourers", no_emp_first: "No managers yet. Add names in Settings first.", select_emp: "Enter labourers for at least one manager.",
+  Object.assign(I18N.en, { who: "No. Of Emp of Managers", no_emp_first: "No managers yet. Add names in Settings first.", select_emp: "Enter labourers for at least one manager.",
     bill_search: "Enter Manager Name", employee_name: "Manager name", bname_ph: "Type manager name", employees: "Managers", employee: "Manager",
     new_name: "New manager name", add: "Add Manager Name", all_emps: "All managers", emp_working: "Managers", emp_details: "All managers details",
     hint_emps: "Renaming also updates the name on past duties. Deleting a manager moves him and all of his duties and advances to Trash below.",
@@ -119,13 +126,18 @@ rep('</head>', '''<style>
 .duties .names li{white-space:nowrap}
 .duties .tag{font-size:.72rem;padding:.2rem .45rem;white-space:nowrap}
 .duties td,.duties th{padding-left:.2rem;padding-right:.2rem}
-.mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;margin:0 0 8px;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);color:#17233b}
-.mrow .mn{font-weight:700;font-size:1rem;min-width:0;overflow-wrap:anywhere}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 10px;margin:0 0 5px;border:2px solid transparent;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);color:#17233b;transition:.15s}
+.mrow .mn{font-weight:700;font-size:.95rem;min-width:0;overflow-wrap:anywhere}
 .mst{display:flex;align-items:center;gap:8px;flex:none}
-.mb{width:40px;height:40px;border-radius:12px;border:0;background:#eef0f5;color:#17233b;font-size:22px;font-weight:700;line-height:1;padding:0;cursor:pointer}
-.mc{width:62px!important;height:42px;margin:0!important;padding:0 4px!important;text-align:center;font-weight:800;font-size:1.1rem;border:2px solid #1d6b4f!important;border-radius:12px;background:#fff;color:#17233b;-moz-appearance:textfield}
+.mb{width:32px;height:32px;border-radius:50%;border:0;background:#e3e7f1;color:#17233b;font-size:19px;font-weight:700;line-height:1;padding:0;cursor:pointer}
+.mc{width:48px!important;height:32px;margin:0!important;padding:0 4px!important;text-align:center;font-weight:800;font-size:1rem;border:2px solid #1d6b4f!important;border-radius:10px;background:#fff;color:#17233b;-moz-appearance:textfield}
 .mc::-webkit-outer-spin-button,.mc::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.mtot{display:flex;justify-content:space-between;padding:10px 14px;border-radius:14px;background:#e9f7ef;color:#17233b;font-weight:800}
+.mrow.on{border-color:#5b3ad6;background:#f3efff;box-shadow:0 0 0 3px rgba(91,58,214,.18),0 4px 12px rgba(91,58,214,.22)}
+.mrow.on .mb{background:#5b3ad6;color:#fff}
+.mrow.on .mc{border-color:#5b3ad6!important}
+.mrow.z .mn,.mrow.z .mc{opacity:.5}
+.mtot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 4px 0;color:#17233b;font-weight:700}
+.mcount{min-width:30px;height:30px;padding:0 8px;border-radius:15px;background:linear-gradient(135deg,#c13cc0,#6a3ad6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 3px 8px rgba(106,58,214,.4)}
 </style>
 </head>''')
 rep('<span data-i18n="add_duty">Add Duty</span>', '<span data-i18n="add_duty">Add Duty</span>')
