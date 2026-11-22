@@ -124,6 +124,11 @@ s = s[:i] + '''  $("save").onclick = function () {
     if (!items.length) return say($("msg"), tx("select_emp"), true);
     var newIds = [];
     items.forEach(function (it) {
+      var key = String(loc).trim().toLowerCase();
+      var same = state.records.filter(function (x) {
+        return x.date === date && x.duty === duty && String(x.loc).trim().toLowerCase() === key && x.names.length === 1 && x.names[0] === it.name;
+      })[0];
+      if (same) { same.cnt = Math.min(9999, cntOf(same) + it.cnt); newIds.push(same.id); return; }
       var lastId = uid(); newIds.push(lastId);
       state.records.push({ id: lastId, date: date, loc: loc, duty: duty, names: [it.name], cnt: it.cnt });
     });
