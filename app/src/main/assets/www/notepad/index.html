@@ -155,7 +155,9 @@ html,body{height:100%}
 /* only the symbol of a bottom tab opens it; taps beside it do nothing */
 .nav button{pointer-events:none}
 .nav button svg{pointer-events:auto}
-.nav button:not(.on) svg{padding:9px;margin:-9px;touch-action:manipulation}
+.nav button:not(.on) svg{padding:24px;margin:-24px;touch-action:manipulation}
+.nav button.on{position:relative}
+.nav button.on::after{content:"";position:absolute;left:-11px;top:50%;width:74px;height:74px;margin-top:-37px;pointer-events:auto}
 /* inside the Android app the app already leaves room for the status bar */
 [data-app] body{padding-top:0;padding-bottom:0}
 [data-app] .top{padding-top:14px}
