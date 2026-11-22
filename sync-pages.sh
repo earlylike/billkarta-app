@@ -23,6 +23,7 @@ patch_page () {
 patch_page "$SRC/frontpage/index.html" "$OUT/frontpage/index.html"
 patch_page "$SRC/Work/index.html"      "$OUT/Work/index.html"
 patch_page "$SRC/forall/index.html"    "$OUT/forall/index.html"
+if [ -f "$SRC/notepad/index.html" ]; then mkdir -p "$OUT/notepad"; patch_page "$SRC/notepad/index.html" "$OUT/notepad/index.html"; fi
 python3 "$(dirname "$0")/tools/patch_location.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_frontpage_bg.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_settings_cards.py" "$OUT"
@@ -41,3 +42,4 @@ python3 "$(dirname "$0")/tools/patch_pdftotal.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_forall_pdf_adv.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_forall_pdf_style.py" "$OUT"
 python3 "$(dirname "$0")/tools/patch_forall_compare.py" "$OUT"
+python3 "$(dirname "$0")/tools/patch_pad.py" "$OUT"
