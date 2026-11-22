@@ -43,7 +43,22 @@ rep('$("list").innerHTML = recs.length', 'var sp = momSpans(recs);\n    $("list"
 rep("""return '<tr data-rid="' + r.id + '"><td><b>' + esc(fmt(r.date)) + '</b></td><td>' + esc(r.loc) + '</td>' +""",
     """return '<tr data-rid="' + r.id + '">' + (sp[r.id] ? '<td class="g" rowspan="' + sp[r.id] + '"><b>' + esc(fmt(r.date)) + '</b></td><td class="g" rowspan="' + sp[r.id] + '">' + esc(r.loc) + '</td>' : '') +""")
 rep("""'<td><ol class="names">' + r.names.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + '</ol></td>' +""", """'<td class="mnm">' + r.names.map(esc).join(", ") + '</td>' +""")
-rep('  function renderList() {', """  function momSpans(recs) {
+rep('  function renderList() {', """  function momHighlight(ids) {
+    var rows = ids.map(function (id) { return document.querySelector('tr[data-rid="' + id + '"]'); }).filter(Boolean);
+    if (!rows.length) return;
+    var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var mid = rows[Math.floor(rows.length / 2)];
+    mid.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
+    var cells = [];
+    rows.forEach(function (row) {
+      row.classList.add("hl");
+      var g = row;
+      while (g && !g.querySelector("td.g")) g = g.previousElementSibling;
+      if (g) [].forEach.call(g.querySelectorAll("td.g"), function (c) { c.classList.add("hlg"); cells.push(c); });
+    });
+    setTimeout(function () { rows.forEach(function (row) { row.classList.remove("hl"); }); cells.forEach(function (c) { c.classList.remove("hlg"); }); }, 2400);
+  }
+  function momSpans(recs) {
     var sp = {}, first = null, key = null, n = 0;
     recs.forEach(function (r) {
       var k = r.date + "|" + String(r.loc).trim().toLowerCase();
@@ -107,9 +122,9 @@ s = s[:i] + '''  $("save").onclick = function () {
     if (!date) return say($("msg"), tx("choose_date"), true);
     if (!loc) return say($("msg"), tx("enter_location"), true);
     if (!items.length) return say($("msg"), tx("select_emp"), true);
-    var lastId = null;
+    var newIds = [];
     items.forEach(function (it) {
-      lastId = uid();
+      var lastId = uid(); newIds.push(lastId);
       state.records.push({ id: lastId, date: date, loc: loc, duty: duty, names: [it.name], cnt: it.cnt });
     });
     var ok = persist();
@@ -117,7 +132,7 @@ s = s[:i] + '''  $("save").onclick = function () {
     mgrSum(); updateSave();
     say($("msg"), ok ? tx("saved") : tx("saved_blocked"), !ok);
     renderLocs(); renderList();
-    highlight(lastId);
+    momHighlight(newIds);
   };
 
 ''' + s[j:]
@@ -136,7 +151,7 @@ rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KE
 rep('</head>', '''<style>
 #cmp,#cmpsheet{display:none!important}
 .mgr{display:block}
-.duties td.g{vertical-align:top;border-right:1px solid rgba(0,0,0,.08)}.duties td.mnm{font-weight:600;white-space:nowrap}
+.duties td.g{vertical-align:middle;border-right:1px solid rgba(0,0,0,.08)}.duties td.g.hlg{background:transparent;animation:dutyflash .7s ease-in-out 3}.duties td.mnm{font-weight:600;white-space:nowrap}
 .duties td:last-child,.duties th:last-child{padding-left:.1rem!important;padding-right:.1rem!important}.duties td:first-child,.duties th:first-child{padding-left:.3rem!important}
 .duties .names{padding-left:.7rem!important}.duties td b{letter-spacing:-.2px}.duties .tag{font-size:.68rem!important}.duties .acts{flex-wrap:nowrap}.duties .tag{padding:.15rem .3rem}
 .duties .ibtn{width:30px!important;height:30px!important}.duties .acts{gap:3px}.duties td{font-size:.78rem}.duties td b{font-size:.7rem}.duties th{font-size:.7rem}
