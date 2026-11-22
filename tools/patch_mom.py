@@ -137,12 +137,29 @@ s = s[:i] + '''  $("save").onclick = function () {
 
 ''' + s[j:]
 # edit dialog: labourer count
-rep('<div class="chips" id="ewho" role="group" aria-labelledby="ewl"></div>', '<div class="chips" id="ewho" role="group" aria-labelledby="ewl"></div>\n    <label for="ecnt">Labourers</label>\n    <input type="number" id="ecnt" min="1" max="9999" step="1" inputmode="numeric">')
-rep('$("emodal").hidden = false; $("edate").focus();', '$("ecnt").value = String(cntOf(r));\n    $("emodal").hidden = false; $("edate").focus();')
+rep('<label id="ewl" data-i18n="who">Who did the duty</label>', '<label id="ewl" data-i18n="mgr_one">Manager</label>')
+rep('<div class="chips" id="ewho" role="group" aria-labelledby="ewl"></div>',
+    '<div class="chips" id="ewho" role="group" aria-labelledby="ewl"></div>\n    <label for="ecnt">No. Of Employees</label>\n    <div class="estep"><button type="button" class="mb" id="ecm" aria-label="-">−</button><input type="number" id="ecnt" class="mc" min="1" max="9999" step="1" inputmode="numeric"><button type="button" class="mb" id="ecp" aria-label="+">+</button></div>')
+# edit: the manager of this entry is fixed; only the count (and date, location, duty type) can change
+i = s.index('    var names = state.employees.map(function (e) { return e.name; });\n    r.names.forEach') if False else None
+_a = s.index('    var names = state.employees.map(function (e) { return e.name; });\n    r.names.forEach')
+_b = s.index('    $("emodal").hidden = false; $("edate").focus();', _a)
+s = s[:_a] + """    var box = $("ewho");
+    box.innerHTML = '<div class="mfix"></div>';
+    box.firstChild.textContent = r.names.join(", ");
+    $("ecnt").value = String(cntOf(r));
+""" + s[_b:]
+rep('$("emodal").hidden = false; $("edate").focus();', '$("emodal").hidden = false; $("edate").focus();')
+rep('var names = [].slice.call(document.querySelectorAll("#ewho input:checked")).map(function (c) { return c.value; });',
+    'var names = (state.records.filter(function (x) { return x.id === editId; })[0] || { names: [] }).names.slice();')
+rep('$("ecancel").onclick = closeEdit;', """$("ecancel").onclick = closeEdit;
+  function ecStep(d) { var v = Math.floor(Number($("ecnt").value)) || 1; $("ecnt").value = String(Math.max(1, Math.min(9999, v + d))); }
+  $("ecm").onclick = function () { ecStep(-1); };
+  $("ecp").onclick = function () { ecStep(1); };""")
 rep('r.duty = dt ? dt.value : r.duty; r.names = names;', 'r.duty = dt ? dt.value : r.duty; r.names = names; r.cnt = Math.max(1, Math.min(9999, Math.floor(Number($("ecnt").value)) || 1));')
 # wording (English) and styles
 rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KEY = "momlog.lang", lang = "en", memLang = null;
-  Object.assign(I18N.en, { who: "No. Of Emp of Managers", no_emp_first: "No managers yet. Add names in Settings first.", select_emp: "Enter labourers for at least one manager.",
+  Object.assign(I18N.en, { who: "No. Of Emp of Managers", mgr_one: "Manager", no_emp_first: "No managers yet. Add names in Settings first.", select_emp: "Enter labourers for at least one manager.",
     bill_search: "Enter Manager Name", employee_name: "Manager name", bname_ph: "Type manager name", employees: "Managers", employee: "Manager",
     new_name: "New manager name", add: "Add Manager Name", all_emps: "All managers", emp_working: "Managers", emp_details: "All managers details",
     hint_emps: "Renaming also updates the name on past duties. Deleting a manager moves him and all of his duties and advances to Trash below.",
@@ -151,6 +168,8 @@ rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KE
 rep('</head>', '''<style>
 #cmp,#cmpsheet{display:none!important}
 .mgr{display:block}
+.mfix{padding:10px 14px;border-radius:14px;background:#eef0f5;color:#17233b;font-weight:800}
+.estep{display:flex;align-items:center;gap:10px;margin-top:6px}.estep .mb{width:40px;height:40px;flex:none}.estep .mc{width:70px!important;height:42px!important;flex:none}.estep .mc:focus{border-color:#5b3ad6!important;box-shadow:0 0 0 4px rgba(91,58,214,.25);background:#f3efff;outline:0}
 .duties td.g{vertical-align:middle;border-right:1px solid rgba(0,0,0,.08)}.duties td.g.hlg{background:transparent;animation:dutyflash .7s ease-in-out 3}.duties td.mnm{font-weight:600;white-space:nowrap}
 .duties td:last-child,.duties th:last-child{padding-left:.1rem!important;padding-right:.1rem!important}.duties td:first-child,.duties th:first-child{padding-left:.3rem!important}
 .duties .names{padding-left:.7rem!important}.duties td b{letter-spacing:-.2px}.duties .tag{font-size:.68rem!important}.duties .acts{flex-wrap:nowrap}.duties .tag{padding:.15rem .3rem}
