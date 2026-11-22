@@ -523,6 +523,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
 </style><style>/* BK-DETAILS-SCROLL */#details{scroll-margin-top:96px}</style><style>
 #cmp,#cmpsheet{display:none!important}
 .mgr{display:block}
+.duties td.g{vertical-align:top;border-right:1px solid rgba(0,0,0,.08)}.duties td.mnm{font-weight:600;white-space:nowrap}
 .duties td:last-child,.duties th:last-child{padding-left:.1rem!important;padding-right:.1rem!important}.duties td:first-child,.duties th:first-child{padding-left:.3rem!important}
 .duties .names{padding-left:.7rem!important}.duties td b{letter-spacing:-.2px}.duties .tag{font-size:.68rem!important}.duties .acts{flex-wrap:nowrap}.duties .tag{padding:.15rem .3rem}
 .duties .ibtn{width:30px!important;height:30px!important}.duties .acts{gap:3px}.duties td{font-size:.78rem}.duties td b{font-size:.7rem}.duties th{font-size:.7rem}
@@ -535,9 +536,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
 .mb{width:32px;height:32px;border-radius:50%;border:0;background:#e3e7f1;color:#17233b;font-size:19px;font-weight:700;line-height:1;padding:0;cursor:pointer}
 .mc{width:48px!important;height:32px;margin:0!important;padding:0 4px!important;text-align:center;font-weight:800;font-size:1rem;border:2px solid #1d6b4f!important;border-radius:10px;background:#fff;color:#17233b;-moz-appearance:textfield}
 .mc::-webkit-outer-spin-button,.mc::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.mrow.on{border-color:#5b3ad6;background:#f3efff;box-shadow:0 0 0 3px rgba(91,58,214,.18),0 4px 12px rgba(91,58,214,.22)}
-.mrow.on .mb{background:#5b3ad6;color:#fff}
-.mrow.on .mc{border-color:#5b3ad6!important}
+.mrow.on .mc{border-color:#5b3ad6!important;box-shadow:0 0 0 4px rgba(91,58,214,.25);background:#f3efff}
 .mrow.z .mn,.mrow.z .mc{opacity:.5}
 .mtot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 4px 0;color:#17233b;font-weight:700}
 .mcount{min-width:30px;height:30px;padding:0 8px;border-radius:15px;background:linear-gradient(135deg,#c13cc0,#6a3ad6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 3px 8px rgba(106,58,214,.4)}
@@ -1070,6 +1069,16 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     var p = d.split("-");
     return (+p[2]) + "/" + (+p[1]) + "/" + p[0];
   }
+  function momSpans(recs) {
+    var sp = {}, first = null, key = null, n = 0;
+    recs.forEach(function (r) {
+      var k = r.date + "|" + String(r.loc).trim().toLowerCase();
+      if (k !== key) { if (first) sp[first] = n; key = k; first = r.id; n = 0; }
+      n++;
+    });
+    if (first) sp[first] = n;
+    return sp;
+  }
   function renderList() {
     // Saved duties are listed by date, oldest first; duties on the same date keep the order they were added in
     var recs = state.records.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
@@ -1093,11 +1102,12 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
             '<span class="c tot' + (f + h ? '' : ' zero') + '">' + (f + h) + '</span></div>';
         }).join("")
       : "";
+    var sp = momSpans(recs);
     $("list").innerHTML = recs.length
       ? '<div class="tscroll"><table class="duties"><thead><tr><th>' + tx("date") + '</th><th>' + tx("location") + '</th><th>' + tx("employees") + '</th><th>' + tx("duty") + '</th><th><span class="sr">' + tx("actions") + '</span></th></tr></thead><tbody>' +
         recs.map(function (r) {
-          return '<tr data-rid="' + r.id + '"><td><b>' + esc(fmt(r.date)) + '</b></td><td>' + esc(r.loc) + '</td>' +
-            '<td><ol class="names">' + r.names.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + '</ol></td>' +
+          return '<tr data-rid="' + r.id + '">' + (sp[r.id] ? '<td class="g" rowspan="' + sp[r.id] + '"><b>' + esc(fmt(r.date)) + '</b></td><td class="g" rowspan="' + sp[r.id] + '">' + esc(r.loc) + '</td>' : '') +
+            '<td class="mnm">' + r.names.map(esc).join(", ") + '</td>' +
             '<td><span class="tag ' + r.duty + '" title="' + (r.duty === "Full" ? tx("full_day") : tx("half_day")) + '">' + (r.duty === "Full" ? tx("fd") : tx("hd")) + " \u00d7" + cntOf(r) + '</span></td>' +
             '<td><div class="acts"><button class="ibtn" data-edit="' + r.id + '" type="button" title="' + tx("upd_duty_t") + '" aria-label="' + tx("upd_duty_t") + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="ibtn del" data-del="' + r.id + '" type="button" title="' + tx("del_duty_t") + '" aria-label="' + tx("del_duty_t") + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div></td></tr>';
         }).join("") + '</tbody></table></div>'

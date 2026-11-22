@@ -38,6 +38,22 @@ s = s.replace('r.duty === "Half" ? "1" : ""', 'r.duty === "Half" ? String(cntOf(
 rep('return { id: r.id, date: r.date, loc: r.loc, duty: r.duty }; });', 'return { id: r.id, date: r.date, loc: r.loc, duty: r.duty, cnt: cntOf(r) }; });')
 rep('duty: tr.duty, names: [t.name] });', 'duty: tr.duty, names: [t.name], cnt: cntOf(tr) });')
 rep('duty: r.duty, names: r.names.slice() });', 'duty: r.duty, names: r.names.slice(), cnt: cntOf(r) });')
+# saved duties: date and location shown once per day+place (merged cells), one line per manager
+rep('$("list").innerHTML = recs.length', 'var sp = momSpans(recs);\n    $("list").innerHTML = recs.length')
+rep("""return '<tr data-rid="' + r.id + '"><td><b>' + esc(fmt(r.date)) + '</b></td><td>' + esc(r.loc) + '</td>' +""",
+    """return '<tr data-rid="' + r.id + '">' + (sp[r.id] ? '<td class="g" rowspan="' + sp[r.id] + '"><b>' + esc(fmt(r.date)) + '</b></td><td class="g" rowspan="' + sp[r.id] + '">' + esc(r.loc) + '</td>' : '') +""")
+rep("""'<td><ol class="names">' + r.names.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + '</ol></td>' +""", """'<td class="mnm">' + r.names.map(esc).join(", ") + '</td>' +""")
+rep('  function renderList() {', """  function momSpans(recs) {
+    var sp = {}, first = null, key = null, n = 0;
+    recs.forEach(function (r) {
+      var k = r.date + "|" + String(r.loc).trim().toLowerCase();
+      if (k !== key) { if (first) sp[first] = n; key = k; first = r.id; n = 0; }
+      n++;
+    });
+    if (first) sp[first] = n;
+    return sp;
+  }
+  function renderList() {""")
 # duty form: manager rows with - / number / +
 i = s.index("  function renderWho() {"); j = s.index("  function renderLocs() {")
 s = s[:i] + '''  function mgrTotal() {
@@ -120,6 +136,7 @@ rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KE
 rep('</head>', '''<style>
 #cmp,#cmpsheet{display:none!important}
 .mgr{display:block}
+.duties td.g{vertical-align:top;border-right:1px solid rgba(0,0,0,.08)}.duties td.mnm{font-weight:600;white-space:nowrap}
 .duties td:last-child,.duties th:last-child{padding-left:.1rem!important;padding-right:.1rem!important}.duties td:first-child,.duties th:first-child{padding-left:.3rem!important}
 .duties .names{padding-left:.7rem!important}.duties td b{letter-spacing:-.2px}.duties .tag{font-size:.68rem!important}.duties .acts{flex-wrap:nowrap}.duties .tag{padding:.15rem .3rem}
 .duties .ibtn{width:30px!important;height:30px!important}.duties .acts{gap:3px}.duties td{font-size:.78rem}.duties td b{font-size:.7rem}.duties th{font-size:.7rem}
@@ -132,9 +149,7 @@ rep('</head>', '''<style>
 .mb{width:32px;height:32px;border-radius:50%;border:0;background:#e3e7f1;color:#17233b;font-size:19px;font-weight:700;line-height:1;padding:0;cursor:pointer}
 .mc{width:48px!important;height:32px;margin:0!important;padding:0 4px!important;text-align:center;font-weight:800;font-size:1rem;border:2px solid #1d6b4f!important;border-radius:10px;background:#fff;color:#17233b;-moz-appearance:textfield}
 .mc::-webkit-outer-spin-button,.mc::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.mrow.on{border-color:#5b3ad6;background:#f3efff;box-shadow:0 0 0 3px rgba(91,58,214,.18),0 4px 12px rgba(91,58,214,.22)}
-.mrow.on .mb{background:#5b3ad6;color:#fff}
-.mrow.on .mc{border-color:#5b3ad6!important}
+.mrow.on .mc{border-color:#5b3ad6!important;box-shadow:0 0 0 4px rgba(91,58,214,.25);background:#f3efff}
 .mrow.z .mn,.mrow.z .mc{opacity:.5}
 .mtot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 4px 0;color:#17233b;font-weight:700}
 .mcount{min-width:30px;height:30px;padding:0 8px;border-radius:15px;background:linear-gradient(135deg,#c13cc0,#6a3ad6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 3px 8px rgba(106,58,214,.4)}
