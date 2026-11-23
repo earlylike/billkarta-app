@@ -15,7 +15,7 @@ def rep(a, b, n=1):
 
 # separate storage
 rep('var KEY = "dutylog.v1";', 'var KEY = "momlog.v1";')
-rep('var LANG_KEY = "dutylog.lang"', 'var LANG_KEY = "momlog.lang"')
+rep('var LANG_KEY = "dutylog.lang"', 'var LANG_KEY = "dutylog.lang"')
 rep('<title>BillKarta</title>', '<title>Manager of Managers</title>')
 rep('kind: "duty-backup"', 'kind: "manager-backup"')
 # labourer-count helper
@@ -163,7 +163,7 @@ rep('$("ecancel").onclick = closeEdit;', """$("ecancel").onclick = closeEdit;
   $("ecp").onclick = function () { ecStep(1); };""")
 rep('r.duty = dt ? dt.value : r.duty; r.names = names;', 'r.duty = dt ? dt.value : r.duty; r.names = names; r.cnt = Math.max(1, Math.min(9999, Math.floor(Number($("ecnt").value)) || 1));')
 # wording (English) and styles
-rep('var LANG_KEY = "momlog.lang", lang = "en", memLang = null;', '''var LANG_KEY = "momlog.lang", lang = "en", memLang = null;
+rep('var LANG_KEY = "dutylog.lang", lang = "en", memLang = null;', '''var LANG_KEY = "dutylog.lang", lang = "en", memLang = null;
   Object.assign(I18N.en, { who: "No. Of Emp of Managers", mgr_one: "Manager", no_emp_first: "No managers yet. Add names in Settings first.", select_emp: "Enter labourers for at least one manager.",
     bill_search: "Enter Manager Name", employee_name: "Manager name", bname_ph: "Type manager name", employees: "Managers", employee: "Manager",
     new_name: "New manager name", add: "Add Manager Name", all_emps: "All managers", emp_working: "Managers", emp_details: "All managers details",

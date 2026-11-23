@@ -471,15 +471,6 @@ body{flex-direction:column;gap:18px}
             <div class="arrow" aria-hidden="true">›</div>
         </button>
 
-        <button type="button" class="tab" aria-pressed="false" data-name="My Notes" data-url="../notepad/index.html"><!-- BK-PAD-CARD -->
-            <div class="tab-icon" aria-hidden="true">🗒️</div>
-            <div class="tab-info">
-                <h3>My Notes</h3>
-                <p>Quick notes, saved on your phone</p>
-            </div>
-            <div class="arrow" aria-hidden="true">›</div>
-        </button>
-
         <button type="button" class="tab" aria-pressed="false" data-name="Manager of Managers" data-url="../mom/index.html"><!-- BK-MOM-CARD -->
             <div class="tab-icon" aria-hidden="true">👷</div>
             <div class="tab-info">
@@ -489,10 +480,15 @@ body{flex-direction:column;gap:18px}
             <div class="arrow" aria-hidden="true">›</div>
         </button>
 
-    </div>
+        <button type="button" class="tab" aria-pressed="false" data-name="My Notes" data-url="../notepad/index.html"><!-- BK-PAD-CARD -->
+            <div class="tab-icon" aria-hidden="true">🗒️</div>
+            <div class="tab-info">
+                <h3>My Notes</h3>
+                <p>Quick notes, saved on your phone</p>
+            </div>
+            <div class="arrow" aria-hidden="true">›</div>
+        </button>
 
-    <div class="selected" id="selected" role="status" aria-live="polite">
-        Personal Selected
     </div>
 
 </main>
@@ -502,7 +498,7 @@ body{flex-direction:column;gap:18px}
 <script>
 (function () {
     var tabs = document.querySelectorAll('.tab');
-    var selected = document.getElementById('selected');
+    var selected = document.getElementById('selected') || document.createElement('div');
 
     // ---- Offline popup: show instantly when there is no internet, reload when it returns ----
     var offEl = document.getElementById('offline');
