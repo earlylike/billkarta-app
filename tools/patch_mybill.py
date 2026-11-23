@@ -17,17 +17,29 @@ def rep(a, b, n=1):
     s = s.replace(a, b)
 
 # titles + button text in every language
-T = {"en": ("My Own Bill", "Download My Own Bill"), "hi": ("मेरा बिल", "मेरा बिल डाउनलोड करें"), "mr": ("माझे बिल", "माझे बिल डाउनलोड करा"),
-     "gu": ("મારું બિલ", "મારું બિલ ડાઉનલોડ કરો"), "pa": ("ਮੇਰਾ ਬਿੱਲ", "ਮੇਰਾ ਬਿੱਲ ਡਾਊਨਲੋਡ ਕਰੋ"), "ta": ("என் பில்", "என் பில்லை பதிவிறக்கு"),
-     "te": ("నా బిల్", "నా బిల్ డౌన్‌లోడ్"), "kn": ("ನನ್ನ ಬಿಲ್", "ನನ್ನ ಬಿಲ್ ಡೌನ್‌ಲೋಡ್")}
-for lg, (t, d) in T.items():
+T = {"en": ("My Own Bill", "Download My Own Bill", "Make Employee's Bill", "Check Employee Bill"),
+     "hi": ("मेरा अपना बिल", "मेरा अपना बिल डाउनलोड करें", "कर्मचारी का बिल बनाएं", "कर्मचारी का बिल जांचें"),
+     "mr": ("माझे स्वतःचे बिल", "माझे स्वतःचे बिल डाउनलोड करा", "कर्मचारीचे बिल तयार करा", "कर्मचारीचे बिल तपासा"),
+     "gu": ("મારું પોતાનું બિલ", "મારું પોતાનું બિલ ડાઉનલોડ કરો", "કર્મચારીનું બિલ બનાવો", "કર્મચારીનું બિલ તપાસો"),
+     "pa": ("ਮੇਰਾ ਆਪਣਾ ਬਿੱਲ", "ਮੇਰਾ ਆਪਣਾ ਬਿੱਲ ਡਾਊਨਲੋਡ ਕਰੋ", "ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਬਣਾਓ", "ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਚੈੱਕ ਕਰੋ"),
+     "ta": ("என் சொந்த பில்", "என் சொந்த பில்லை பதிவிறக்கு", "ஊழியர் பில் உருவாக்கு", "ஊழியர் பில் சரிபார்"),
+     "te": ("నా సొంత బిల్", "నా సొంత బిల్ డౌన్‌లోడ్", "ఉద్యోగి బిల్లు తయారు చేయండి", "ఉద్యోగి బిల్లు తనిఖీ"),
+     "kn": ("ನನ್ನ ಸ್ವಂತ ಬಿಲ್", "ನನ್ನ ಸ್ವಂತ ಬಿಲ್ ಡೌನ್‌ಲೋಡ್", "ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಮಾಡಿ", "ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಪರಿಶೀಲಿಸಿ")}
+def setkey(s, key, val, lo, hi):
+    m = re.compile(r'"%s":\s*"' % key).search(s, lo, hi)
+    assert m, (key, lo)
+    q1 = m.end(); q2 = s.index('"', q1)
+    return s[:q1] + val + s[q2:]
+for lg, (t, d, mk, ck) in T.items():
     m = re.search(r'(\n?\s*(?:var I18N = \{ )?%s: \{)("cmp_title")' % lg, s)
     assert m, lg
     s = s[:m.end(1)] + '"dl_mybill": "%s", ' % d + s[m.end(1):]
     seg_start = m.start()
-    m2 = re.compile(r'"emp_details":\s*"').search(s, seg_start)
-    q1 = m2.end(); q2 = s.index('"', q1)
-    s = s[:q1] + t + s[q2:]
+    ends = [x.start() for x in re.finditer(r'\n\s*(?:mr|hi|gu|pa|ta|te|kn): \{"', s) if x.start() > seg_start]
+    seg_end = min(ends) if ends else len(s)
+    s = setkey(s, "emp_details", t, seg_start, seg_end)
+    s = setkey(s, "cmp_title", ck, seg_start, seg_end)
+    s = setkey(s, "bill", mk, seg_start, seg_end)
 rep('esc(tx("dl_pdf")) + \'</button><p class="msg" id="dmsg"', 'esc(tx("dl_mybill")) + \'</button><p class="msg" id="dmsg"')
 
 # Make a Bill PDF made reusable
@@ -50,7 +62,6 @@ rep('''    var fname = (b.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, 
 
 rep('    line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);', '    if (!my) line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);')
 rep('    line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);', '    if (!my) line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);')
-rep('"bill":"Make A Bill"', '"bill":"Make Employee\'s Bill"')
 rep('<span data-i18n="bill">Make A Bill</span>', '<span data-i18n="bill">Make Employee\'s Bill</span>')
 # My Bill card: the advance is not subtracted
 rep('    state.employees.forEach(function (e) { total -= advTotal(e.id); });\n', '')
