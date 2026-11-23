@@ -17,7 +17,7 @@ def rep(a, b, n=1):
     s = s.replace(a, b)
 
 # titles + button text in every language
-T = {"en": ("My Bill", "Download My Bill"), "hi": ("मेरा बिल", "मेरा बिल डाउनलोड करें"), "mr": ("माझे बिल", "माझे बिल डाउनलोड करा"),
+T = {"en": ("My Own Bill", "Download My Own Bill"), "hi": ("मेरा बिल", "मेरा बिल डाउनलोड करें"), "mr": ("माझे बिल", "माझे बिल डाउनलोड करा"),
      "gu": ("મારું બિલ", "મારું બિલ ડાઉનલોડ કરો"), "pa": ("ਮੇਰਾ ਬਿੱਲ", "ਮੇਰਾ ਬਿੱਲ ਡਾਊਨਲੋਡ ਕਰੋ"), "ta": ("என் பில்", "என் பில்லை பதிவிறக்கு"),
      "te": ("నా బిల్", "నా బిల్ డౌన్‌లోడ్"), "kn": ("ನನ್ನ ಬಿಲ್", "ನನ್ನ ಬಿಲ್ ಡೌನ್‌ಲೋಡ್")}
 for lg, (t, d) in T.items():
@@ -50,6 +50,8 @@ rep('''    var fname = (b.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, 
 
 rep('    line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);', '    if (!my) line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);')
 rep('    line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);', '    if (!my) line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);')
+rep('"bill":"Make A Bill"', '"bill":"Make Employee\'s Bill"')
+rep('<span data-i18n="bill">Make A Bill</span>', '<span data-i18n="bill">Make Employee\'s Bill</span>')
 # My Bill card: the advance is not subtracted
 rep('    state.employees.forEach(function (e) { total -= advTotal(e.id); });\n', '')
 rep("""'</b></div><p class="dc-note">' + esc(tx("adv_subtracted")) + '</p></div>' +""", """'</b></div></div>' +""")
