@@ -1,0 +1,69 @@
+# ---- Check all Manager's Bill (compare a manager's My Bill PDF with the entries on this page; dates only, location is not checked) ----
+rep('        else if (t === "1") { if (z.x / 2.8346 < 166) half++; else full++; }',
+    '        else if (/^\\d+$/.test(t) && Number(t) > 0 && z.x / 2.8346 > 138) { var cn = Number(t); if (z.x / 2.8346 < 166) half += cn; else full += cn; }')
+rep('if (res.name !== null && /^_*$/.test(res.name)) res.name = "";', 'if (res.name !== null && /^_*$/.test(res.name)) res.name = "";\n      if (res.name) res.name = res.name.replace(/^Manager\\s*-\\s*/i, "").trim();')
+_a = s.index("  function cmpCompare(emp, pdf, pend) {"); _b = s.index("  function cmpMakePdf(emp, r) {")
+s = s[:_a] + r'''  function cmpCompare(emp, pdf, pend) {
+    var dmAdv = state.advances.filter(function (a) { return a.empId === emp.id; }).map(function (a) { return { date: a.date, amount: a.amount }; });
+    var mine = {}, locs = {};
+    state.records.forEach(function (r) {
+      if (r.names.indexOf(emp.name) < 0) return;
+      var m = mine[r.date] = mine[r.date] || { h: 0, f: 0 };
+      if (r.duty === "Half") m.h += cntOf(r); else m.f += cntOf(r);
+      if (!locs[r.date]) locs[r.date] = r.loc || "";
+    });
+    var theirs = {}, tl = {};
+    pdf.duty.forEach(function (d) { var t = theirs[d.date] = theirs[d.date] || { h: 0, f: 0 }; t.h += d.h; t.f += d.f; if (!tl[d.date]) tl[d.date] = d.loc; });
+    function by(list) { var m = {}; list.forEach(function (r) { (m[r.date] = m[r.date] || []).push(r); }); return m; }
+    function keys(a, b) { var k = {}; Object.keys(a).concat(Object.keys(b)).forEach(function (d) { k[d] = 1; }); return Object.keys(k).sort(); }
+    function sum(l, f) { return l.reduce(function (s, r) { return s + r[f]; }, 0); }
+    var out = { duty: [], adv: [], good: 0, bad: 0 };
+    keys(theirs, mine).forEach(function (d) {
+      var p = theirs[d], m = mine[d];
+      if (p && m && p.h === m.h && p.f === m.f) { out.duty.push({ k: "ok", date: d, h: m.h, f: m.f, loc: tl[d] || locs[d] || "" }); out.good++; return; }
+      if (p) { out.duty.push({ k: "bad", date: d, h: p.h, f: p.f, loc: tl[d] || "" }); out.bad++; }
+      if (m) { out.duty.push({ k: "fix", date: d, h: m.h, f: m.f, loc: p ? (tl[d] || locs[d] || "") : tx("cmp_missing") }); out.good++; }
+    });
+    var pa = by(pdf.adv), da = by(dmAdv);
+    keys(pa, da).forEach(function (d) {
+      var p = pa[d] || [], m = da[d] || [];
+      if (p.length && sum(p, "amount") === sum(m, "amount")) {
+        p.forEach(function (r) { out.adv.push({ k: "ok", date: d, amount: r.amount }); out.good++; });
+      } else {
+        p.forEach(function (r) { out.adv.push({ k: "bad", date: d, amount: r.amount }); out.bad++; });
+        m.forEach(function (r) { out.adv.push({ k: "fix", date: d, amount: r.amount }); out.good++; });
+      }
+    });
+    out.pdfAdv = sum(pdf.adv, "amount"); out.dmAdv = sum(dmAdv, "amount");
+    out.hd = 0; out.fd = 0;
+    Object.keys(mine).forEach(function (d) { out.hd += mine[d].h; out.fd += mine[d].f; });
+    out.rh = rateOf(emp, "Half"); out.rf = rateOf(emp, "Full");
+    out.hAmt = out.hd * out.rh; out.fAmt = out.fd * out.rf;
+    out.gross = out.hAmt + out.fAmt; out.sub = out.gross - out.dmAdv; out.pend = 0; out.net = out.sub;
+    out.pdfFinal = pdf.final;
+    var S = pdf.sum || {}, ph = 0, pf = 0;
+    pdf.duty.forEach(function (x) { ph += x.h; pf += x.f; });
+    var M = pdfMoney;
+    function hl(n, rt, am) { return PS("Half Days") + ": " + n + "  (" + n + " x " + M(rt) + " = " + M(am) + ")"; }
+    function fl(n, rt, am) { return PS("Full Days") + ": " + n + "  (" + n + " x " + M(rt) + " = " + M(am) + ")"; }
+    var oh = S.hd || { n: ph, rt: out.rh, am: ph * out.rh }, of = S.fd || { n: pf, rt: out.rf, am: pf * out.rf };
+    var og = S.gross !== undefined ? S.gross : oh.am + of.am, oa = S.adv !== undefined ? S.adv : out.pdfAdv;
+    var os = S.sub !== undefined ? S.sub : og - oa;
+    out.lines = [
+      { o: hl(oh.n, oh.rt, oh.am), n: hl(out.hd, out.rh, out.hAmt) },
+      { o: fl(of.n, of.rt, of.am), n: fl(out.fd, out.rf, out.fAmt) },
+      { o: PS("Total Payment") + ": " + M(og), n: PS("Total Payment") + ": " + M(out.gross) },
+      { o: PS("Advance") + ": - " + M(oa), n: PS("Advance") + ": - " + M(out.dmAdv) },
+      { o: M(og) + " - " + M(oa) + " = " + M(os), n: M(out.gross) + " - " + M(out.dmAdv) + " = " + M(out.sub) }
+    ];
+    return out;
+  }
+''' + s[_b:]
+rep('PS("Name") + ": " + emp.name', '"Manager - " + emp.name', 2)
+rep('x.h ? "1" : "", x.f ? "1" : ""]; }),', 'x.h ? String(x.h) : "", x.f ? String(x.f) : ""]; }),')
+rep('[x.h ? "1" : "", "c"], [x.f ? "1" : "", "c"]]', '[x.h ? String(x.h) : "", "c"], [x.f ? String(x.f) : "", "c"]]')
+rep('id="cgo" type="button" data-i18n="cmp_title">Compare PDF', 'id="cgo" type="button" data-i18n="cmp_go">Check Bill')
+rep('#cmp,#cmpsheet{display:none!important}', '#cmp .brow{display:none}')
+rep('  Object.assign(I18N.en, {', """  Object.keys(I18N).forEach(function (l) { Object.assign(I18N[l], { cmp_title: "Check all Manager's Bill", cmp_go: "Check Bill", cmp_dl: "Download corrected PDF", cmp_missing: "Missing in the PDF",
+    cmp_note: "Note: Choose {emp} PDF bill (Manager - {emp})." }); });
+  Object.assign(I18N.en, {""")

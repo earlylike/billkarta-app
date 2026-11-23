@@ -195,6 +195,7 @@ rep('</head>', '''<style>
 </style>
 </head>''')
 rep('<span data-i18n="add_duty">Add Duty</span>', '<span data-i18n="add_duty">Add Duty</span>')
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mom_compare.pyinc"), encoding="utf-8").read())
 out = os.path.join(root, "mom"); os.makedirs(out, exist_ok=True)
 open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(s)
 print("mom: page built")
