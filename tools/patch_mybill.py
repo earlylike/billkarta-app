@@ -36,18 +36,23 @@ rep('  function makePdf() {\n    var b = billData, msg = $("pmsg");\n    if (!b)
 rep('var nameText = PS("Name") + ": " + (b.name || "____________________");', 'var nameText = my ? my.title : PS("Name") + ": " + (b.name || "____________________");')
 rep('r.duty === "Half" ? "1" : "", r.duty === "Full" ? "1" : ""]; }),',
     'b.my ? (r.Half ? String(r.Half) : "") : (r.duty === "Half" ? "1" : ""), b.my ? (r.Full ? String(r.Full) : "") : (r.duty === "Full" ? "1" : "")]; }),')
-rep('doc.roundedRect(14, y, W - 28, 78, 3, 3, "S");', 'doc.roundedRect(14, y, W - 28, my ? 66 : 78, 3, 3, "S");')
+rep('doc.roundedRect(14, y, W - 28, 78, 3, 3, "S");', 'doc.roundedRect(14, y, W - 28, my ? 48 : 78, 3, 3, "S");')
 rep('PS("Half Days") + ": " + b.hd + "  (" + b.hd + " x " + money(b.rh) + " = " + money(b.hAmt) + ")"',
     'PS("Half Days") + ": " + b.hd + (b.rh === null ? "  (" + money(b.hAmt) + ")" : "  (" + b.hd + " x " + money(b.rh) + " = " + money(b.hAmt) + ")")')
 rep('PS("Full Days") + ": " + b.fd + "  (" + b.fd + " x " + money(b.rf) + " = " + money(b.fAmt) + ")"',
     'PS("Full Days") + ": " + b.fd + (b.rf === null ? "  (" + money(b.fAmt) + ")" : "  (" + b.fd + " x " + money(b.rf) + " = " + money(b.fAmt) + ")")')
 rep('    line(money(net1) + " + " + money(b.pend || 0) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);',
     '    if (!my) line(money(net1) + " + " + money(b.pend || 0) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);')
-rep('line(PS("Final Payment") + " = " + money(b.net), 20, y + 68, 16, true, teal);', 'line(PS("Final Payment") + " = " + money(b.net), 20, y + (my ? 58 : 68), 16, true, teal);')
+rep('line(PS("Final Payment") + " = " + money(b.net), 20, y + 68, 16, true, teal);', 'line(PS("Final Payment") + " = " + money(b.net), 20, y + (my ? 40 : 68), 16, true, teal);')
 rep('''    var fname = (b.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Duty-Log") + "-bill.pdf";
     showPdfActions(fname, buf);''', '''    var fname = my ? my.fname : (b.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Duty-Log") + "-bill.pdf";
     showPdfActions(fname, buf, my ? my.box : undefined);''')
 
+rep('    line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);', '    if (!my) line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);')
+rep('    line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);', '    if (!my) line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);')
+# My Bill card: the advance is not subtracted
+rep('    state.employees.forEach(function (e) { total -= advTotal(e.id); });\n', '')
+rep("""'</b></div><p class="dc-note">' + esc(tx("adv_subtracted")) + '</p></div>' +""", """'</b></div></div>' +""")
 # My Bill: build the bill data and use the Make a Bill layout
 i = s.index("  function makeDetailsPdf() {"); j = s.index("  var pdfUrl = null;", i)
 s = s[:i] + '''  function myName() { try { return (localStorage.getItem("dutylog.mname") || "").trim(); } catch (e) { return ""; } }
@@ -68,7 +73,7 @@ s = s[:i] + '''  function myName() { try { return (localStorage.getItem("dutylog
     var b = { my: true, name: nm, rows: d.rows, hd: d.hd, fd: d.fd, hAmt: hAmt, fAmt: fAmt,
       rh: hk.length === 1 ? Number(hk[0]) : hk.length === 0 ? (Number(state.rates.Half) || 0) : null,
       rf: fk.length === 1 ? Number(fk[0]) : fk.length === 0 ? (Number(state.rates.Full) || 0) : null,
-      adv: adv, net: hAmt + fAmt - adv, pend: 0, advRows: advRows };
+      adv: adv, net: hAmt + fAmt, pend: 0, advRows: advRows };
     makePdfFrom(b, $("dmsg"), { title: title, fname: title.replace(/[\\\\\\/:*?"<>|]+/g, "").trim() + ".pdf", box: "dacts" });
   }
 ''' + s[j:]

@@ -1068,7 +1068,6 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
         total += rateOf(e, r.duty);
       });
     });
-    state.employees.forEach(function (e) { total -= advTotal(e.id); });
     return total;
   }
   function renderDetails() {
@@ -1097,7 +1096,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
       '<div class="dtot"><div><span>' + esc(tx("full_days")) + '</span><b>= ' + fd + '</b></div>' +
       '<div><span>' + esc(tx("half_days")) + '</span><b>= ' + hd + '</b></div>' +
       '<div class="dgrand"><span>' + esc(tx("total")) + '</span><b>' + (fd + hd) + '</b></div></div>' +
-      '<div class="dcomplete"><div class="dc-row"><span>' + esc(tx("complete_bill")) + '</span><b>' + esc(moneyS(complete)) + '</b></div><p class="dc-note">' + esc(tx("adv_subtracted")) + '</p></div>' +
+      '<div class="dcomplete"><div class="dc-row"><span>' + esc(tx("complete_bill")) + '</span><b>' + esc(moneyS(complete)) + '</b></div></div>' +
       '<button class="btn save" id="dpdfbtn" type="button">' + esc(tx("dl_mybill")) + '</button><p class="msg" id="dmsg" aria-live="polite"></p><div class="pacts" id="dacts"></div>';
     $("dpdfbtn").onclick = makeDetailsPdf;
   }
@@ -1618,16 +1617,16 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     if (y > 195) { doc.addPage(); y = 20; }
     doc.setDrawColor(15, 118, 110);
     doc.setLineWidth(0.6);
-    doc.roundedRect(14, y, W - 28, my ? 66 : 78, 3, 3, "S");
+    doc.roundedRect(14, y, W - 28, my ? 48 : 78, 3, 3, "S");
     var ink = [23, 35, 59], teal = [15, 118, 110];
     var gross = b.hAmt + b.fAmt, net1 = gross - b.adv;
     line(PS("Half Days") + ": " + b.hd + (b.rh === null ? "  (" + money(b.hAmt) + ")" : "  (" + b.hd + " x " + money(b.rh) + " = " + money(b.hAmt) + ")"), 20, y + 11, 12, false, ink);
     line(PS("Full Days") + ": " + b.fd + (b.rf === null ? "  (" + money(b.fAmt) + ")" : "  (" + b.fd + " x " + money(b.rf) + " = " + money(b.fAmt) + ")"), 20, y + 20, 12, false, ink);
     line(PS("Total Payment") + ": " + money(gross), 20, y + 29, 12, false, ink);
-    line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);
-    line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);
+    if (!my) line(PS("Advance") + ": - " + money(b.adv), 20, y + 38, 12, false, ink);
+    if (!my) line(money(gross) + " - " + money(b.adv) + " = " + money(net1), 20, y + 47, 12, false, ink);
     if (!my) line(money(net1) + " + " + money(b.pend || 0) + " (" + PS("Pending payment") + ")", 20, y + 58, 12, false, ink);
-    line(PS("Final Payment") + " = " + money(b.net), 20, y + (my ? 58 : 68), 16, true, teal);
+    line(PS("Final Payment") + " = " + money(b.net), 20, y + (my ? 40 : 68), 16, true, teal);
     var buf = doc.output("arraybuffer");
     var fname = my ? my.fname : (b.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "Duty-Log") + "-bill.pdf";
     showPdfActions(fname, buf, my ? my.box : undefined);
@@ -2065,7 +2064,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     var b = { my: true, name: nm, rows: d.rows, hd: d.hd, fd: d.fd, hAmt: hAmt, fAmt: fAmt,
       rh: hk.length === 1 ? Number(hk[0]) : hk.length === 0 ? (Number(state.rates.Half) || 0) : null,
       rf: fk.length === 1 ? Number(fk[0]) : fk.length === 0 ? (Number(state.rates.Full) || 0) : null,
-      adv: adv, net: hAmt + fAmt - adv, pend: 0, advRows: advRows };
+      adv: adv, net: hAmt + fAmt, pend: 0, advRows: advRows };
     makePdfFrom(b, $("dmsg"), { title: title, fname: title.replace(/[\\\/:*?"<>|]+/g, "").trim() + ".pdf", box: "dacts" });
   }
   var pdfUrl = null;
