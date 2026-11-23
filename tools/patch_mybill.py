@@ -17,14 +17,17 @@ def rep(a, b, n=1):
     s = s.replace(a, b)
 
 # titles + button text in every language
-T = {"en": ("My Own Bill", "Download My Own Bill", "Make Employee's Bill", "Check Employee Bill"),
-     "hi": ("मेरा अपना बिल", "मेरा अपना बिल डाउनलोड करें", "कर्मचारी का बिल बनाएं", "कर्मचारी का बिल जांचें"),
-     "mr": ("माझे स्वतःचे बिल", "माझे स्वतःचे बिल डाउनलोड करा", "कर्मचारीचे बिल तयार करा", "कर्मचारीचे बिल तपासा"),
-     "gu": ("મારું પોતાનું બિલ", "મારું પોતાનું બિલ ડાઉનલોડ કરો", "કર્મચારીનું બિલ બનાવો", "કર્મચારીનું બિલ તપાસો"),
-     "pa": ("ਮੇਰਾ ਆਪਣਾ ਬਿੱਲ", "ਮੇਰਾ ਆਪਣਾ ਬਿੱਲ ਡਾਊਨਲੋਡ ਕਰੋ", "ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਬਣਾਓ", "ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਚੈੱਕ ਕਰੋ"),
-     "ta": ("என் சொந்த பில்", "என் சொந்த பில்லை பதிவிறக்கு", "ஊழியர் பில் உருவாக்கு", "ஊழியர் பில் சரிபார்"),
-     "te": ("నా సొంత బిల్", "నా సొంత బిల్ డౌన్‌లోడ్", "ఉద్యోగి బిల్లు తయారు చేయండి", "ఉద్యోగి బిల్లు తనిఖీ"),
-     "kn": ("ನನ್ನ ಸ್ವಂತ ಬಿಲ್", "ನನ್ನ ಸ್ವಂತ ಬಿಲ್ ಡೌನ್‌ಲೋಡ್", "ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಮಾಡಿ", "ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಪರಿಶೀಲಿಸಿ")}
+T = {
+     "en": ('My Total Bill', 'Download My Total Bill', "Make Employee's Bill", 'Check Employee Bill'),
+     "hi": ('मेरा कुल बिल', 'मेरा कुल बिल डाउनलोड करें', 'कर्मचारी का बिल बनाएं', 'कर्मचारी का बिल जांचें'),
+     "mr": ('माझे एकूण बिल', 'माझे एकूण बिल डाउनलोड करा', 'कर्मचारीचे बिल तयार करा', 'कर्मचारीचे बिल तपासा'),
+     "gu": ('મારું કુલ બિલ', 'મારું કુલ બિલ ડાઉનલોડ કરો', 'કર્મચારીનું બિલ બનાવો', 'કર્મચારીનું બિલ તપાસો'),
+     "pa": ('ਮੇਰਾ ਕੁੱਲ ਬਿੱਲ', 'ਮੇਰਾ ਕੁੱਲ ਬਿੱਲ ਡਾਊਨਲੋਡ ਕਰੋ', 'ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਬਣਾਓ', 'ਕਰਮਚਾਰੀ ਦਾ ਬਿੱਲ ਚੈੱਕ ਕਰੋ'),
+     "ta": ('என் மொத்த பில்', 'என் மொத்த பில்லை பதிவிறக்கு', 'ஊழியர் பில் உருவாக்கு', 'ஊழியர் பில் சரிபார்'),
+     "te": ('నా మొత్తం బిల్', 'నా మొత్తం బిల్ డౌన్\u200cలోడ్', 'ఉద్యోగి బిల్లు తయారు చేయండి', 'ఉద్యోగి బిల్లు తనిఖీ'),
+     "kn": ('ನನ್ನ ಒಟ್ಟು ಬಿಲ್', 'ನನ್ನ ಒಟ್ಟು ಬಿಲ್ ಡೌನ್\u200cಲೋಡ್', 'ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಮಾಡಿ', 'ಉದ್ಯೋಗಿಯ ಬಿಲ್ ಪರಿಶೀಲಿಸಿ'),
+}
+MN = {'en': ('Manager Name', 'Your name (shown on My Total Bill PDF)', 'Enter manager name', 'Save name'), 'hi': ('मैनेजर का नाम', 'आपका नाम (मेरा कुल बिल PDF पर दिखेगा)', 'मैनेजर का नाम दर्ज करें', 'नाम सेव करें'), 'mr': ('मॅनेजरचे नाव', 'तुमचे नाव (माझे एकूण बिल PDF वर दिसेल)', 'मॅनेजरचे नाव लिहा', 'नाव सेव्ह करा'), 'gu': ('મેનેજરનું નામ', 'તમારું નામ (મારું કુલ બિલ PDF પર દેખાશે)', 'મેનેજરનું નામ લખો', 'નામ સેવ કરો'), 'pa': ('ਮੈਨੇਜਰ ਦਾ ਨਾਮ', 'ਤੁਹਾਡਾ ਨਾਮ (ਮੇਰਾ ਕੁੱਲ ਬਿੱਲ PDF ਤੇ ਦਿਸੇਗਾ)', 'ਮੈਨੇਜਰ ਦਾ ਨਾਮ ਲਿਖੋ', 'ਨਾਮ ਸੇਵ ਕਰੋ'), 'ta': ('மேனேஜர் பெயர்', 'உங்கள் பெயர் (என் மொத்த பில் PDF-ல் தோன்றும்)', 'மேனேஜர் பெயரை உள்ளிடவும்', 'பெயரைச் சேமி'), 'te': ('మేనేజర్ పేరు', 'మీ పేరు (నా మొత్తం బిల్ PDF లో కనిపిస్తుంది)', 'మేనేజర్ పేరు నమోదు చేయండి', 'పేరు సేవ్ చేయండి'), 'kn': ('ಮ್ಯಾನೇಜರ್ ಹೆಸರು', 'ನಿಮ್ಮ ಹೆಸರು (ನನ್ನ ಒಟ್ಟು ಬಿಲ್ PDF ನಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ)', 'ಮ್ಯಾನೇಜರ್ ಹೆಸರು ನಮೂದಿಸಿ', 'ಹೆಸರು ಉಳಿಸಿ')}
 def setkey(s, key, val, lo, hi):
     m = re.compile(r'"%s":\s*"' % key).search(s, lo, hi)
     assert m, (key, lo)
@@ -33,7 +36,7 @@ def setkey(s, key, val, lo, hi):
 for lg, (t, d, mk, ck) in T.items():
     m = re.search(r'(\n?\s*(?:var I18N = \{ )?%s: \{)("cmp_title")' % lg, s)
     assert m, lg
-    s = s[:m.end(1)] + '"dl_mybill": "%s", ' % d + s[m.end(1):]
+    s = s[:m.end(1)] + '"dl_mybill": "%s", "mn_title": "%s", "mn_label": "%s", "mn_ph": "%s", "mn_save": "%s", ' % ((d,) + MN[lg]) + s[m.end(1):]
     seg_start = m.start()
     ends = [x.start() for x in re.finditer(r'\n\s*(?:mr|hi|gu|pa|ta|te|kn): \{"', s) if x.start() > seg_start]
     seg_end = min(ends) if ends else len(s)
@@ -94,10 +97,11 @@ s = s[:i] + '''  function myName() { try { return (localStorage.getItem("dutylog
 # Settings: manager name, typed once
 card = '''<section id="p-set" hidden>
     <div class="card" id="mncard">
-      <h2 class="ratesh"><span class="ratesh-t">Manager Name</span></h2>
-      <label for="mname" style="margin-top:0">Your name (shown on My Bill PDF)</label>
-      <input type="text" id="mname" maxlength="40" autocomplete="off" placeholder="Enter manager name">
-      <button class="btn save" id="mnsave" type="button">Save name</button>
+      <style>#mnsave:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4)}</style>
+      <h2 class="ratesh"><span class="ratesh-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg></span><span class="ratesh-t" data-i18n="mn_title">Manager Name</span></h2>
+      <label for="mname" style="margin-top:0" data-i18n="mn_label">Your name (shown on My Total Bill PDF)</label>
+      <input type="text" id="mname" maxlength="40" autocomplete="off" data-i18n-ph="mn_ph" placeholder="Enter manager name">
+      <button class="btn save" id="mnsave" type="button" data-i18n="mn_save" disabled>Save name</button>
       <p class="msg" id="mnmsg" aria-live="polite"></p>
     </div>
 '''
@@ -105,9 +109,12 @@ rep('<section id="p-set" hidden>\n', card)
 rep('  function myName() {', '''  (function () {
     var inp = $("mname"); if (!inp) return;
     try { inp.value = localStorage.getItem("dutylog.mname") || ""; } catch (e) {}
+    var sv = $("mnsave");
+    function sync() { sv.disabled = !inp.value.trim(); }
+    inp.addEventListener("input", sync); sync();
     $("mnsave").onclick = function () {
-      var v = inp.value.trim(); inp.value = v;
-      try { localStorage.setItem("dutylog.mname", v); say($("mnmsg"), v ? "Saved." : "Name cleared."); } catch (e) { say($("mnmsg"), "Could not save on this phone.", true); }
+      var v = inp.value.trim(); inp.value = v; if (!v) { sync(); return; }
+      try { localStorage.setItem("dutylog.mname", v); say($("mnmsg"), "Saved."); } catch (e) { say($("mnmsg"), "Could not save on this phone.", true); }
     };
   })();
   function myName() {''')
