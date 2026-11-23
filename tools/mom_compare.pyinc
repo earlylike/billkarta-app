@@ -62,6 +62,14 @@ rep('x.h ? "1" : "", x.f ? "1" : ""]; }),', 'x.h ? String(x.h) : "", x.f ? Strin
 rep('[x.h ? "1" : "", "c"], [x.f ? "1" : "", "c"]]', '[x.h ? String(x.h) : "", "c"], [x.f ? String(x.f) : "", "c"]]')
 rep('id="cgo" type="button" data-i18n="cmp_title">Compare PDF', 'id="cgo" type="button" data-i18n="cmp_go">Check Bill')
 rep('#cmp,#cmpsheet{display:none!important}', '#cmp .brow{display:none}')
-rep('  Object.assign(I18N.en, {', """  Object.keys(I18N).forEach(function (l) { Object.assign(I18N[l], { cmp_title: "Check all Manager's Bill", cmp_go: "Check Bill", cmp_dl: "Download corrected PDF", cmp_missing: "Missing in the PDF",
-    cmp_note: "Note: Choose {emp} PDF bill (Manager - {emp})." }); });
-  Object.assign(I18N.en, {""")
+_CMPT = {
+ "en": ["Check all Manager's Bill", "Check Bill", "Download corrected PDF", "Missing in the PDF", "Note: Choose {emp} PDF bill (Manager - {emp})."],
+ "hi": ["सभी मैनेजर का बिल जांचें", "बिल जांचें", "सही किया हुआ PDF डाउनलोड करें", "PDF में नहीं है", "नोट: {emp} का PDF बिल चुनें (Manager - {emp})।"],
+ "mr": ["सर्व मॅनेजरचे बिल तपासा", "बिल तपासा", "दुरुस्त केलेली PDF डाउनलोड करा", "PDF मध्ये नाही", "टीप: {emp} यांचे PDF बिल निवडा (Manager - {emp})."],
+ "gu": ["બધા મેનેજરનું બિલ તપાસો", "બિલ તપાસો", "સુધારેલી PDF ડાઉનલોડ કરો", "PDF માં નથી", "નોંધ: {emp} નું PDF બિલ પસંદ કરો (Manager - {emp})."],
+ "pa": ["ਸਾਰੇ ਮੈਨੇਜਰਾਂ ਦਾ ਬਿੱਲ ਚੈੱਕ ਕਰੋ", "ਬਿੱਲ ਚੈੱਕ ਕਰੋ", "ਸਹੀ ਕੀਤੀ PDF ਡਾਊਨਲੋਡ ਕਰੋ", "PDF ਵਿੱਚ ਨਹੀਂ ਹੈ", "ਨੋਟ: {emp} ਦਾ PDF ਬਿੱਲ ਚੁਣੋ (Manager - {emp})।"],
+ "ta": ["அனைத்து மேனேஜர் பில்லையும் சரிபார்", "பில் சரிபார்", "திருத்திய PDF பதிவிறக்கு", "PDF-ல் இல்லை", "குறிப்பு: {emp} PDF பில்லைத் தேர்ந்தெடுக்கவும் (Manager - {emp})."],
+ "te": ["అన్ని మేనేజర్ల బిల్లు తనిఖీ", "బిల్లు తనిఖీ", "సరిచేసిన PDF డౌన్‌లోడ్", "PDF లో లేదు", "గమనిక: {emp} PDF బిల్లును ఎంచుకోండి (Manager - {emp})."],
+ "kn": ["ಎಲ್ಲಾ ಮ್ಯಾನೇಜರ್ ಬಿಲ್ ಪರಿಶೀಲಿಸಿ", "ಬಿಲ್ ಪರಿಶೀಲಿಸಿ", "ಸರಿಪಡಿಸಿದ PDF ಡೌನ್‌ಲೋಡ್", "PDF ನಲ್ಲಿ ಇಲ್ಲ", "ಸೂಚನೆ: {emp} PDF ಬಿಲ್ ಆಯ್ಕೆಮಾಡಿ (Manager - {emp})."]}
+_cj = __import__("json").dumps({k: {"cmp_title": v[0], "cmp_go": v[1], "cmp_dl": v[2], "cmp_missing": v[3], "cmp_note": v[4]} for k, v in _CMPT.items()}, ensure_ascii=False)
+rep('  Object.assign(I18N.en, {', "  var CMPT = " + _cj + ";\n  Object.keys(I18N).forEach(function (l) { Object.assign(I18N[l], CMPT[l] || CMPT.en); });\n  Object.assign(I18N.en, {")
