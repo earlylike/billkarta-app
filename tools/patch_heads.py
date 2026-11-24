@@ -38,7 +38,7 @@ f = f[:j] + HM_CARD + f[j:]
 
 # ---------- Add Duty: Select Head Of Manager ----------
 SEL = '''<label id="hsl" data-i18n="hm_sel">Select Head Of Manager</label>
-      <div style="position:relative"><input type="text" id="hsel" readonly data-i18n-ph="hm_sel_ph" placeholder="Example - Shelar sir" style="padding-right:44px;cursor:pointer" autocomplete="off"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);fill:none;stroke:#4338ca;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none"><path d="M6 9l6 6 6-6"/></svg></div>
+      <div style="position:relative"><input type="text" id="hsel" readonly data-i18n-ph="hm_sel_ph" placeholder="Example - Shelar sir" style="padding-right:44px;cursor:pointer" autocomplete="off"><svg class="hmchev" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);fill:none;stroke:#4338ca;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none"><path d="M6 9l6 6 6-6"/></svg><span class="hmtick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></div>
       '''
 rep('<label id="wl" data-i18n="who">Who did the duty</label>', SEL + '<label id="wl" data-i18n="who">Who did the duty</label>')
 ESEL = SEL.replace('hsl', 'ehsl').replace('id="hsel"', 'id="ehsel"')
@@ -63,7 +63,7 @@ rep('<div id="emodal" class="overlay"', HMODAL + '<div id="emodal" class="overla
 
 # ---------- My Total Bill: head box ----------
 rep('<div id="dbody" hidden><div id="dout"></div></div>',
-    '<div id="dbody" hidden><div id="hbbox" style="margin:2px 0 12px"><label for="hbin" style="display:block;margin-top:0" data-i18n="hm_sel">Select Head Of Manager</label><input type="text" id="hbin" data-i18n-ph="hm_sel_ph" placeholder="Example - Shelar sir" autocomplete="off"><div id="hbsug"></div></div><div id="dout"></div></div>')
+    '<div id="dbody" hidden><div id="hbbox" style="margin:2px 0 12px"><label for="hbin" style="display:block;margin-top:0" data-i18n="hm_sel">Select Head Of Manager</label><div style="position:relative"><input type="text" id="hbin" data-i18n-ph="hm_sel_ph" placeholder="Example - Shelar sir" autocomplete="off"><span class="hmtick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></div><div id="hbsug"></div></div><div id="dout"></div></div>')
 
 # ---------- Add Duty: compulsory, saved ----------
 rep('var ok = $("date").value && $("loc").value.trim() && document.querySelectorAll("#who input:checked").length > 0;',
@@ -74,7 +74,7 @@ rep('state.records.push({ id: newId, date: date, loc: loc, duty: duty, names: na
     'state.records.push({ id: newId, date: date, loc: loc, duty: duty, names: names, head: $("hsel").value.trim() });')
 # edit
 rep('$("edate").value = r.date; $("eloc").value = r.loc; $("emsg").textContent = "";',
-    '$("edate").value = r.date; $("eloc").value = r.loc; $("emsg").textContent = ""; $("ehsel").value = r.head || "";')
+    '$("edate").value = r.date; $("eloc").value = r.loc; $("emsg").textContent = ""; $("ehsel").value = r.head || ""; paintTicks();')
 rep('    if (!names.length) return say($("emsg"), tx("select_emp"), true);',
     '    if (!names.length) return say($("emsg"), tx("select_emp"), true);\n    if (!$("ehsel").value.trim()) return say($("emsg"), tx("hm_sel"), true);')
 rep('r.date = date; r.loc = loc; r.duty = dt ? dt.value : r.duty; r.names = names;',
@@ -83,7 +83,7 @@ rep('r.date = date; r.loc = loc; r.duty = dt ? dt.value : r.duty; r.names = name
 rep("""return '<tr data-rid="' + r.id + '"><td><b>' + esc(fmt(r.date)) + '</b></td>""",
     """return '<tr data-rid="' + r.id + '"><td><b>' + esc(fmt(r.date)) + '</b>' + (r.head ? '<div class="hmtag">' + esc(r.head) + '</div>' : '') + '</td>""")
 rep("</style>\n", "</style>\n<style>/* BK-HEADS */.hmtag{margin-top:4px;font-size:11px;font-weight:600;color:#4338ca;line-height:1.2;word-break:break-word}</style>\n", n=f.count("</style>\n") and 1) if False else None
-f = f.replace("</head>", "<style>/* BK-HEADS */.hmtag{margin-top:4px;font-size:11px;font-weight:600;color:#4338ca;line-height:1.2;word-break:break-word}#hbsug .hbs{background:#fff;border-radius:16px;margin-top:6px;box-shadow:0 8px 24px rgba(40,30,120,.25);overflow:hidden}#hbsug .hbi{display:flex;align-items:center;gap:10px;padding:11px 14px;font-weight:600;color:#1b1b2f;cursor:pointer;border-top:1px solid #eee}#hbsug .hbi:first-child{border-top:0}#hbsug .hbi i{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#4338ca,#6d28d9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-style:normal;flex:none}</style></head>", 1)
+f = f.replace("</head>", "<style>/* BK-HEADS */.hmtag{margin-top:4px;font-size:11px;font-weight:600;color:#4338ca;line-height:1.2;word-break:break-word}.hmtick{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#16a34a;align-items:center;justify-content:center;pointer-events:none}.hmtick svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}.hmon .hmtick{display:flex}.hmon .hmchev{display:none}.hmon>input{border:2px solid #16a34a !important;padding-right:52px !important}#hbsug .hbs{background:#fff;border-radius:16px;margin-top:6px;box-shadow:0 8px 24px rgba(40,30,120,.25);overflow:hidden}#hbsug .hbi{display:flex;align-items:center;gap:10px;padding:11px 14px;font-weight:600;color:#1b1b2f;cursor:pointer;border-top:1px solid #eee}#hbsug .hbi:first-child{border-top:0}#hbsug .hbi i{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#4338ca,#6d28d9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-style:normal;flex:none}</style></head>", 1)
 
 # ---------- My Total Bill: only the chosen head's duties ----------
 rep('''    var groups = {}, order = [], fd = 0, hd = 0;
@@ -139,11 +139,16 @@ JS = r'''
   }
   var headIc = { edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
     del: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>' };
+  function paintTicks() {
+    [["hsel", $("hsel") && $("hsel").value.trim()], ["ehsel", $("ehsel") && $("ehsel").value.trim()], ["hbin", curHead]].forEach(function (p) {
+      var el = $(p[0]); if (el && el.parentNode) el.parentNode.classList.toggle("hmon", !!p[1]);
+    });
+  }
   function syncHeadPickers() {
     var names = headNames();
     ["hsel", "ehsel"].forEach(function (id) { if ($(id) && $(id).value && names.indexOf($(id).value) < 0 && id === "hsel") $(id).value = ""; });
     if ($("hbin")) { var m = headMatch($("hbin").value); if (!m) { $("hbin").value = $("hbin").value; } curHead = m; }
-    updateSave(); renderDetails();
+    paintTicks(); updateSave(); renderDetails();
   }
   function renderHeads() {
     var box = $("hmlist"); if (!box) return; box.innerHTML = "";
@@ -201,7 +206,7 @@ JS = r'''
     state.records.forEach(function (r) { if (r.head === old) r.head = n; });
     if ($("hsel").value === old) $("hsel").value = n;
     if ($("hbin").value.trim().toLowerCase() === old.toLowerCase()) $("hbin").value = n;
-    persist(); closeHeadEdit(); renderHeads(); renderList();
+    persist(); closeHeadEdit(); renderHeads(); renderList(); paintTicks();
   };
   // popup list of heads (Add Duty and Update duty)
   function openHeadPicker(current, cb) {
@@ -229,8 +234,8 @@ JS = r'''
     ov.appendChild(sheet); ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
     document.body.appendChild(ov);
   }
-  $("hsel").addEventListener("click", function () { openHeadPicker($("hsel").value, function (n) { $("hsel").value = n; updateSave(); }); });
-  $("ehsel").addEventListener("click", function () { openHeadPicker($("ehsel").value, function (n) { $("ehsel").value = n; }); });
+  $("hsel").addEventListener("click", function () { openHeadPicker($("hsel").value, function (n) { $("hsel").value = n; paintTicks(); updateSave(); }); });
+  $("ehsel").addEventListener("click", function () { openHeadPicker($("ehsel").value, function (n) { $("ehsel").value = n; paintTicks(); }); });
   // My Total Bill: type to find a head, the list shows by itself
   function showHeadSug() {
     var v = $("hbin").value.trim().toLowerCase(), box = $("hbsug");
@@ -242,10 +247,10 @@ JS = r'''
     [].forEach.call(box.querySelectorAll(".hbi"), function (el, i) {
       el.children[0].textContent = (graphemes(list[i].name)[0] || "?").toUpperCase(); el.children[1].textContent = list[i].name;
       el.onmousedown = function (e) { e.preventDefault(); };
-      el.onclick = function () { $("hbin").value = list[i].name; box.innerHTML = ""; curHead = list[i].name; renderDetails(); };
+      el.onclick = function () { $("hbin").value = list[i].name; box.innerHTML = ""; curHead = list[i].name; paintTicks(); renderDetails(); };
     });
   }
-  $("hbin").addEventListener("input", function () { curHead = headMatch(this.value); showHeadSug(); renderDetails(); });
+  $("hbin").addEventListener("input", function () { curHead = headMatch(this.value); showHeadSug(); paintTicks(); renderDetails(); });
   $("hbin").addEventListener("focus", showHeadSug);
   $("hbin").addEventListener("blur", function () { setTimeout(function () { $("hbsug").innerHTML = ""; }, 400); });
 '''
