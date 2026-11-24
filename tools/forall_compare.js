@@ -89,6 +89,7 @@
     return cmpStreams(new Uint8Array(buf)).then(function (pages) {
       var items = [];
       pages.forEach(function (t, p) { cmpParseContent(t, p, items); });
+      items = items.filter(function (it) { return !/^Head Of Manager\s*:/i.test(String(it.t).trim()); });
       if (!items.length) return null;
       items.sort(function (a, b) { return a.p - b.p || b.y - a.y || a.x - b.x; });
       var lines = [], cur = null;
