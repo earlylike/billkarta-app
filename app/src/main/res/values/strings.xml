@@ -3,4 +3,7 @@
     <string name="saved_to_downloads">Saved to Downloads/BillKarta: %1$s</string>
     <string name="save_failed">Could not save the file</string>
     <string name="no_app_for_link">No app found to open this link</string>
+    <string name="update_title">Update needed</string>
+    <string name="update_msg">A new version of BillKarta is available. Please update to continue.</string>
+    <string name="update_btn">Update now</string>
 </resources>

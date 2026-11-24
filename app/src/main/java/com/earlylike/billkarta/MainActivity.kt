@@ -29,7 +29,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import androidx.activity.result.IntentSenderRequest
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -42,6 +49,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var outer: FrameLayout
     private lateinit var splash: FrameLayout
     private var splashStart = 0L
+
+    // Forced (immediate) update through Google Play. Only works for the Play Store install; other installs just skip it.
+    private var appUpdateManager: AppUpdateManager? = null
+    private var updateDialog: AlertDialog? = null
+    private var updateFlowActive = false
+
+    private val updateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            updateFlowActive = false
+            if (result.resultCode != RESULT_OK) showUpdateDialog()
+        }
 
     private val fileChooser =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -166,10 +184,80 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        try {
+            appUpdateManager = AppUpdateManagerFactory.create(this)
+        } catch (e: Exception) {
+            appUpdateManager = null
+        }
+
         if (savedInstanceState == null) {
             webView.loadUrl(HOME_URL)
         } else {
             webView.restoreState(savedInstanceState)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkForUpdate()
+    }
+
+    /** Asks Google Play (in the background) if a newer version exists; if so, starts the full-screen immediate update. */
+    private fun checkForUpdate() {
+        val mgr = appUpdateManager ?: return
+        if (updateFlowActive || updateDialog?.isShowing == true) return
+        try {
+            mgr.appUpdateInfo.addOnSuccessListener { info ->
+                if (isFinishing || isDestroyed || updateFlowActive || updateDialog?.isShowing == true) return@addOnSuccessListener
+                val a = info.updateAvailability()
+                if (a == UpdateAvailability.UPDATE_AVAILABLE ||
+                    a == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                ) {
+                    if (info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                        try {
+                            updateFlowActive = true
+                            mgr.startUpdateFlowForResult(
+                                info, updateLauncher,
+                                AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                            )
+                        } catch (e: Exception) {
+                            updateFlowActive = false
+                            showUpdateDialog()
+                        }
+                    } else {
+                        showUpdateDialog()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Not installed from Google Play (test build): nothing to do.
+        }
+    }
+
+    /** Our own blocking card, used when Play cannot update inside the app. Opens the Play Store page. */
+    private fun showUpdateDialog() {
+        if (isFinishing || isDestroyed || updateDialog?.isShowing == true) return
+        val dlg = AlertDialog.Builder(this)
+            .setTitle(R.string.update_title)
+            .setMessage(R.string.update_msg)
+            .setCancelable(false)
+            .setPositiveButton(R.string.update_btn, null)
+            .create()
+        dlg.show()
+        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { openPlayStorePage() }
+        updateDialog = dlg
+    }
+
+    private fun openPlayStorePage() {
+        val id = "com.earlylike.billkarta"
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$id")))
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$id")))
+            } catch (e2: Exception) {
+                Toast.makeText(this, R.string.no_app_for_link, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -202,6 +290,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        updateDialog?.dismiss()
         filePathCallback?.onReceiveValue(null)
         filePathCallback = null
         webView.destroy()

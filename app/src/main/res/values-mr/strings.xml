@@ -1,0 +1,5 @@
+<resources>
+    <string name="update_title">अपडेट आवश्यक आहे</string>
+    <string name="update_msg">BillKarta ची नवीन आवृत्ती उपलब्ध आहे. पुढे जाण्यासाठी कृपया अपडेट करा.</string>
+    <string name="update_btn">आता अपडेट करा</string>
+</resources>
