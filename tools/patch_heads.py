@@ -175,9 +175,11 @@ JS = r'''
   };
   $("hmname").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("hmadd").click(); } });
   function deleteHead(h) {
-    state.heads = state.heads.filter(function (x) { return x.id !== h.id; });
-    state.trash.push({ id: uid(), kind: "head", name: h.name, empId: null, deletedAt: today(), records: [], advances: [] });
-    persist(); renderHeads(); renderTrash();
+    ask(tx("hm_del_q"), tx("hm_del_body", { name: h.name }), tx("hm_del_btn"), function () {
+      state.heads = state.heads.filter(function (x) { return x.id !== h.id; });
+      state.trash.push({ id: uid(), kind: "head", name: h.name, empId: null, deletedAt: today(), records: [], advances: [] });
+      persist(); renderHeads(); renderTrash();
+    }, false);
   }
   function restoreHead(t) {
     if (headDup(t.name)) return say($("tmsg"), tx("hm_exists"), true);
@@ -239,13 +241,13 @@ JS = r'''
     box.innerHTML = '<div class="hbs">' + list.map(function (h, i) { return '<div class="hbi" data-i="' + i + '"><i></i><span></span></div>'; }).join("") + "</div>";
     [].forEach.call(box.querySelectorAll(".hbi"), function (el, i) {
       el.children[0].textContent = (graphemes(list[i].name)[0] || "?").toUpperCase(); el.children[1].textContent = list[i].name;
-      el.onmousedown = el.ontouchstart = function (e) { e.preventDefault(); };
+      el.onmousedown = function (e) { e.preventDefault(); };
       el.onclick = function () { $("hbin").value = list[i].name; box.innerHTML = ""; curHead = list[i].name; renderDetails(); };
     });
   }
   $("hbin").addEventListener("input", function () { curHead = headMatch(this.value); showHeadSug(); renderDetails(); });
   $("hbin").addEventListener("focus", showHeadSug);
-  $("hbin").addEventListener("blur", function () { setTimeout(function () { $("hbsug").innerHTML = ""; }, 200); });
+  $("hbin").addEventListener("blur", function () { setTimeout(function () { $("hbsug").innerHTML = ""; }, 400); });
 '''
 rep("  function refreshAll() {", JS + "  function refreshAll() {")
 # first paint
@@ -262,10 +264,19 @@ T = {
  "te": ["హెడ్ ఆఫ్ మేనేజర్", "హెడ్ ఆఫ్ మేనేజర్‌ను జోడించండి", "ఉదా. శేలార్ సర్", "హెడ్ ఆఫ్ మేనేజర్‌ను ఎంచుకోండి", "ఉదాహరణ - శేలార్ సర్", "ఇంకా హెడ్ లేరు. ముందుగా సెట్టింగ్స్‌లో పేర్లు జోడించండి.", "అతని డ్యూటీలు చూడటానికి హెడ్ ఆఫ్ మేనేజర్‌ను ఎంచుకోండి.", "ఈ హెడ్ ఇప్పటికే జాబితాలో ఉన్నారు.", "పేరు అప్‌డేట్ చేయండి", "తొలగించు (ట్రాష్‌కు వెళ్తుంది)"],
  "kn": ["ಹೆಡ್ ಆಫ್ ಮ್ಯಾನೇಜರ್", "ಹೆಡ್ ಆಫ್ ಮ್ಯಾನೇಜರ್ ಸೇರಿಸಿ", "ಉದಾ. ಶೇಲಾರ್ ಸರ್", "ಹೆಡ್ ಆಫ್ ಮ್ಯಾನೇಜರ್ ಆಯ್ಕೆಮಾಡಿ", "ಉದಾಹರಣೆ - ಶೇಲಾರ್ ಸರ್", "ಇನ್ನೂ ಹೆಡ್ ಇಲ್ಲ. ಮೊದಲು ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಹೆಸರುಗಳನ್ನು ಸೇರಿಸಿ.", "ಅವರ ಡ್ಯೂಟಿಗಳನ್ನು ನೋಡಲು ಹೆಡ್ ಆಫ್ ಮ್ಯಾನೇಜರ್ ಆಯ್ಕೆಮಾಡಿ.", "ಈ ಹೆಡ್ ಈಗಾಗಲೇ ಪಟ್ಟಿಯಲ್ಲಿದ್ದಾರೆ.", "ಹೆಸರು ಅಪ್‌ಡೇಟ್ ಮಾಡಿ", "ಅಳಿಸಿ (ಟ್ರ್ಯಾಶ್‌ಗೆ ಹೋಗುತ್ತದೆ)"]}
 KEYS = ["hm_title", "hm_label", "hm_ph", "hm_sel", "hm_sel_ph", "hm_none", "hm_pick", "hm_exists", "hm_edit_t", "hm_del_t"]
+T2 = {
+ "en": ["Delete this Head Of Manager?", "{name} will move to Trash. You can restore it from Trash any time.", "Delete"],
+ "hi": ["इस हेड ऑफ मैनेजर को हटाएं?", "{name} ट्रैश में चला जाएगा। आप इसे कभी भी ट्रैश से वापस ला सकते हैं।", "हटाएं"],
+ "mr": ["हे हेड ऑफ मॅनेजर हटवायचे?", "{name} ट्रॅशमध्ये जाईल. तुम्ही ते कधीही ट्रॅशमधून परत आणू शकता.", "हटवा"],
+ "gu": ["આ હેડ ઓફ મેનેજર કાઢી નાખવા છે?", "{name} ટ્રેશમાં જશે. તમે તેને ગમે ત્યારે ટ્રેશમાંથી પાછા લાવી શકો છો.", "કાઢી નાખો"],
+ "pa": ["ਇਸ ਹੈੱਡ ਆਫ ਮੈਨੇਜਰ ਨੂੰ ਮਿਟਾਉਣਾ ਹੈ?", "{name} ਟ੍ਰੈਸ਼ ਵਿੱਚ ਚਲਾ ਜਾਵੇਗਾ। ਤੁਸੀਂ ਇਸਨੂੰ ਕਦੇ ਵੀ ਟ੍ਰੈਸ਼ ਵਿੱਚੋਂ ਵਾਪਸ ਲਿਆ ਸਕਦੇ ਹੋ।", "ਮਿਟਾਓ"],
+ "ta": ["இந்த ஹெட் ஆஃப் மேனேஜரை நீக்கவா?", "{name} குப்பைக்குச் செல்லும். எப்போது வேண்டுமானாலும் குப்பையிலிருந்து மீட்டெடுக்கலாம்.", "நீக்கு"],
+ "te": ["ఈ హెడ్ ఆఫ్ మేనేజర్‌ను తొలగించాలా?", "{name} ట్రాష్‌కు వెళ్తుంది. మీరు ఎప్పుడైనా ట్రాష్ నుండి తిరిగి తీసుకురావచ్చు.", "తొలగించు"],
+ "kn": ["ಈ ಹೆಡ್ ಆಫ್ ಮ್ಯಾನೇಜರ್ ಅಳಿಸಬೇಕೆ?", "{name} ಟ್ರ್ಯಾಶ್‌ಗೆ ಹೋಗುತ್ತದೆ. ನೀವು ಯಾವಾಗ ಬೇಕಾದರೂ ಟ್ರ್ಯಾಶ್‌ನಿಂದ ಮರಳಿ ತರಬಹುದು.", "ಅಳಿಸಿ"]}
 for lg, vals in T.items():
     m = re.search(r'(\n?\s*(?:var I18N = \{ )?%s: \{)(")' % lg, f)
     assert m, lg
-    d = dict(zip(KEYS, vals)); d["hm_add"] = vals[1]
+    d = dict(zip(KEYS, vals)); d["hm_add"] = vals[1]; d.update(zip(["hm_del_q", "hm_del_body", "hm_del_btn"], T2[lg]))
     ins = "".join('%s: %s, ' % (json.dumps(k), json.dumps(v, ensure_ascii=False)) for k, v in d.items())
     f = f[:m.end(1)] + ins + f[m.end(1):]
 open(fp, "w", encoding="utf-8").write(f)
