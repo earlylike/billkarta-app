@@ -1881,7 +1881,7 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
     Object.keys(mine).forEach(function (d) { out.hd += mine[d].h; out.fd += mine[d].f; });
     out.rh = rateOf(emp, "Half"); out.rf = rateOf(emp, "Full");
     out.hAmt = out.hd * out.rh; out.fAmt = out.fd * out.rf;
-    out.gross = out.hAmt + out.fAmt; out.sub = out.gross; out.pend = 0; out.net = out.gross;
+    out.gross = out.hAmt + out.fAmt; out.sub = out.gross - out.dmAdv; out.pend = 0; out.net = out.sub;
     out.pdfFinal = pdf.final;
     var S = pdf.sum || {}, ph = 0, pf = 0;
     pdf.duty.forEach(function (x) { ph += x.h; pf += x.f; });
@@ -1896,6 +1896,10 @@ main>section,main>#adv,#p-duty,#p-adv,#p-set{animation:bkIn .4s cubic-bezier(.2,
       { o: fl(of.n, of.rt, of.am), n: fl(out.fd, out.rf, out.fAmt) },
       { o: PS("Total Payment") + ": " + M(og), n: PS("Total Payment") + ": " + M(out.gross) }
     ];
+    if (oa || out.dmAdv) {
+      out.lines.push({ o: PS("Advance") + ": - " + M(oa), n: PS("Advance") + ": - " + M(out.dmAdv) });
+      out.lines.push({ o: M(og) + " - " + M(oa) + " = " + M(os), n: M(out.gross) + " - " + M(out.dmAdv) + " = " + M(out.sub) });
+    }
     return out;
   }
   function cmpMakePdf(emp, r) {

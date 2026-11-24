@@ -27,7 +27,7 @@ HM_CARD = '''
       <h2 class="ratesh"><span class="ratesh-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.3"/><path d="M5 20a7 7 0 0114 0"/><path d="M9 3.2l1.6 1.4L12 2.6l1.4 2 1.6-1.4"/></svg></span><span class="ratesh-t" data-i18n="hm_title">Head Of Manager</span></h2>
       <label for="hmname" style="margin-top:0" data-i18n="hm_label">Add Head Of Manager</label>
       <input type="text" id="hmname" maxlength="40" autocomplete="off" data-i18n-ph="hm_ph" placeholder="Ex. Shelar sir">
-      <button class="btn" id="hmadd" type="button" data-i18n="hm_add" disabled>Add Head Of Manager</button>
+      <button class="btn save" id="hmadd" type="button" data-i18n="hm_add" disabled>Add Head Of Manager</button>
       <p class="msg" id="hmmsg" aria-live="polite"></p>
       <div id="hmlist" style="margin-top:.9rem"></div>
     </div>
