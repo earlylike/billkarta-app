@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""App-only: builds "Manager of Managers" (assets/www/mom) from the already patched Duty Manager page and adds its front-page card.
+"""App-only: builds "Senior Manager" (assets/www/mom) from the already patched Duty Manager page and adds its front-page card.
 Each saved duty is one manager + a labourer count (cnt); bills multiply the manager's rate by the count. Compare PDF is hidden for now.
 Usage: patch_mom.py <assets/www folder>   (idempotent: rebuilt every run)"""
 import os, sys
@@ -16,7 +16,7 @@ def rep(a, b, n=1):
 # separate storage
 rep('var KEY = "dutylog.v1";', 'var KEY = "momlog.v1";')
 rep('var LANG_KEY = "dutylog.lang"', 'var LANG_KEY = "dutylog.lang"')
-rep('<title>BillKarta</title>', '<title>Manager of Managers</title>')
+rep('<title>BillKarta</title>', '<title>Senior Manager</title>')
 rep('kind: "duty-backup"', 'kind: "manager-backup"')
 # labourer-count helper
 rep('  var mem = null;\n', '  var mem = null;\n  function cntOf(r) { var c = Number(r && r.cnt); return c > 0 ? Math.floor(c) : 1; }\n')
@@ -212,11 +212,11 @@ if "BK-MOM-CARD" not in f:
     assert f.count(anchor) == 1
     card = '''        </button>
 
-        <button type="button" class="tab" aria-pressed="false" data-name="Manager of Managers" data-url="../mom/index.html"><!-- BK-MOM-CARD -->
+        <button type="button" class="tab" aria-pressed="false" data-name="Senior Manager" data-url="../mom/index.html"><!-- BK-MOM-CARD -->
             <div class="tab-icon" aria-hidden="true">👷</div>
             <div class="tab-info">
-                <h3>Manager of Managers</h3>
-                <p>Track labourers of every manager</p>
+                <h3>Senior Manager</h3>
+                <p>Track work of every manager</p>
             </div>
             <div class="arrow" aria-hidden="true">›</div>
         </button>
@@ -226,4 +226,4 @@ if "BK-MOM-CARD" not in f:
     <div class="selected" id="selected"'''
     f = f.replace(anchor, card, 1)
     open(fp, "w", encoding="utf-8").write(f)
-    print("front page: Manager of Managers card added")
+    print("front page: Senior Manager card added")

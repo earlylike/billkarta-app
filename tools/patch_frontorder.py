@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""App-only, front page: no "Personal Selected" text; order Personal, Duty Manager, Manager of Managers, My Notes."""
+"""App-only, front page: no "Personal Selected" text; order Personal, Duty Manager, Senior Manager, My Notes."""
 import os, re, sys
 root = sys.argv[1]
 fp = os.path.join(root, "frontpage", "index.html")
@@ -14,11 +14,11 @@ def block(name):
     m = re.search(r'        <button type="button" class="tab"[^>]*data-name="%s".*?</button>\n\n?' % re.escape(name), f, flags=re.S)
     assert m, name
     return m
-pad, mom = block("My Notes"), block("Manager of Managers")
+pad, mom = block("My Notes"), block("Senior Manager")
 if pad.start() < mom.start():
     pt = pad.group(0)
     f = f[:pad.start()] + f[pad.end():]
-    mom = block("Manager of Managers")
+    mom = block("Senior Manager")
     mt = mom.group(0)
     f = f[:mom.start()] + mt.rstrip("\n") + "\n\n" + pt.rstrip("\n") + "\n\n" + f[mom.end():]
 open(fp, "w", encoding="utf-8").write(f)
