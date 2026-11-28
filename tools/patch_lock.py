@@ -7,9 +7,9 @@
 import json, os, re, sys
 root = sys.argv[1]
 LG = ["en", "hi", "mr", "gu", "pa", "ta", "te", "kn"]
-RATES = {"en": ["Payment Per Duty", "Save payment"], "hi": ["प्रति ड्यूटी भुगतान", "भुगतान सेव करें"], "mr": ["प्रति ड्यूटी पेमेंट", "पेमेंट सेव्ह करा"],
-  "gu": ["પ્રતિ ડ્યુટી ચુકવણી", "ચુકવણી સાચવો"], "pa": ["ਪ੍ਰਤੀ ਡਿਊਟੀ ਭੁਗਤਾਨ", "ਭੁਗਤਾਨ ਸੰਭਾਲੋ"], "ta": ["ஒரு டியூட்டிக்கான கட்டணம்", "கட்டணத்தைச் சேமி"],
-  "te": ["డ్యూటీకి చెల్లింపు", "చెల్లింపు సేవ్ చేయండి"], "kn": ["ಪ್ರತಿ ಡ್ಯೂಟಿಗೆ ಪಾವತಿ", "ಪಾವತಿ ಉಳಿಸಿ"]}
+RATES = {"en": ["Payment for Employee per day", "Save payment"], "hi": ["कर्मचारी का प्रतिदिन भुगतान", "भुगतान सेव करें"], "mr": ["कर्मचाऱ्याचे प्रतिदिन पेमेंट", "पेमेंट सेव्ह करा"],
+  "gu": ["કર્મચારીની પ્રતિ દિવસ ચુકવણી", "ચુકવણી સાચવો"], "pa": ["ਕਰਮਚਾਰੀ ਦਾ ਪ੍ਰਤੀ ਦਿਨ ਭੁਗਤਾਨ", "ਭੁਗਤਾਨ ਸੰਭਾਲੋ"], "ta": ["ஊழியருக்கு ஒரு நாள் கட்டணம்", "கட்டணத்தைச் சேமி"],
+  "te": ["ఉద్యోగికి రోజుకు చెల్లింపు", "చెల్లింపు సేవ్ చేయండి"], "kn": ["ನೌಕರರಿಗೆ ದಿನಕ್ಕೆ ಪಾವತಿ", "ಪಾವತಿ ಉಳಿಸಿ"]}
 LK = {"en": ["Tap the lock icon to unlock this entry", "Unlock this entry", "Lock this entry"],
   "hi": ["इस एंट्री को खोलने के लिए लॉक आइकन पर टैप करें", "एंट्री अनलॉक करें", "एंट्री लॉक करें"],
   "mr": ["ही नोंद अनलॉक करण्यासाठी लॉक आयकॉनवर टॅप करा", "नोंद अनलॉक करा", "नोंद लॉक करा"],
@@ -19,7 +19,7 @@ LK = {"en": ["Tap the lock icon to unlock this entry", "Unlock this entry", "Loc
   "te": ["ఈ ఎంట్రీని అన్‌లాక్ చేయడానికి లాక్ ఐకాన్‌ను నొక్కండి", "ఎంట్రీ అన్‌లాక్ చేయండి", "ఎంట్రీ లాక్ చేయండి"],
   "kn": ["ಈ ಎಂಟ್ರಿಯನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಲಾಕ್ ಐಕಾನ್ ಟ್ಯಾಪ್ ಮಾಡಿ", "ಎಂಟ್ರಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿ", "ಎಂಟ್ರಿ ಲಾಕ್ ಮಾಡಿ"]}
 
-CSS = """<style>/* BK-LOCK */.lkb{display:grid;place-items:center;width:28px;height:28px;margin-top:6px;padding:0;border:0;border-radius:50%;background:#b45309;color:#fff;cursor:pointer}.lkb.open{background:#16a34a}.lkb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}tr.lkd .acts .ibtn{opacity:.4}#lktoast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:9999;max-width:88vw;background:#111827;color:#fff;padding:.6rem 1rem;border-radius:999px;font-size:.85rem;font-weight:600;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s}#lktoast.on{opacity:1}[data-i18n="rates"].ratesh-t{font-size:1.02rem}.seg input:disabled:not(:checked)+span{opacity:.4;cursor:not-allowed}.seg input:disabled+span{cursor:default}</style>"""
+CSS = """<style>/* BK-LOCK */.lkb{display:grid;place-items:center;width:28px;height:28px;margin-top:6px;padding:0;border:0;border-radius:50%;background:#b45309;color:#fff;cursor:pointer}.lkb.open{background:#16a34a}.lkb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}tr.lkd .acts .ibtn{opacity:.4}#lktoast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:9999;max-width:88vw;background:#111827;color:#fff;padding:.6rem 1rem;border-radius:999px;font-size:.85rem;font-weight:600;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s}#lktoast.on{opacity:1}[data-i18n="rates"].ratesh-t{font-size:.86rem}.seg input:disabled:not(:checked)+span{opacity:.4;cursor:not-allowed}.seg input:disabled+span{cursor:default}</style>"""
 
 JS = r'''
   /* BK-LOCK: saved entries are locked until the lock under the date is tapped */
@@ -92,7 +92,7 @@ for page in ["forall", "mom"]:
         seg2 = re.sub(r'"save_rates": ?"(?:[^"\\]|\\.)*"', '"save_rates": %s' % json.dumps(RATES[lg][1], ensure_ascii=False), seg2, count=1)
         assert seg2 != seg, lg
         f = f[:m.start()] + seg2 + f[end:]
-    rep('data-i18n="rates">Rates</span>', 'data-i18n="rates">Payment Per Duty</span>')
+    rep('data-i18n="rates">Rates</span>', 'data-i18n="rates">Payment for Employee per day</span>')
     rep('data-i18n="save_rates">Save rates</button>', 'data-i18n="save_rates">Save payment</button>')
     open(fp, "w", encoding="utf-8").write(f)
     print("lock: %s patched" % page)

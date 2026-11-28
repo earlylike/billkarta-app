@@ -23,7 +23,7 @@ Downloads/BillKarta folder on your request.
 **WhatsApp:** If you tap the WhatsApp button, the bill text is passed to the WhatsApp app
 on your phone. WhatsApp's own privacy policy applies from there.
 
-**Permissions:** The app requests no permissions and does not itself send or collect any of your data. When you open the app, Google Play may check whether a newer version is available (this is done by Google Play, and nothing you entered is sent).
+**Permissions:** The app requests no permissions and does not itself send or collect any of your data. When you open the app, Google Play may check whether a newer version is available (this is done by Google Play, and nothing you entered is sent). The WhatsApp and Instagram buttons in the app open those apps (or the browser) with a link, and their own privacy policies apply there.
 
 **Children:** The app is not directed at children.
 
