@@ -6,7 +6,7 @@ f = open(fp, encoding="utf-8").read()
 if "BK-SWAP" in f:
     print("swapcorner: already patched"); sys.exit(0)
 CSS = ("<style>/* BK-SWAP */#bkLangBtn{position:fixed;top:12px;right:12px;z-index:20;padding:7px 12px;font-size:12px;gap:6px}"
-       ".bk-share{position:relative;top:auto;right:auto;left:auto;bottom:auto;transform:none;flex:none;width:37px;height:37px}.container .header p{display:none}"
+       ".bk-share{position:relative;top:auto;right:auto;left:auto;bottom:auto;transform:none;flex:none;margin-bottom:-55px;width:37px;height:37px}.container .header p{display:none}"
        ".bk-share svg{width:15px;height:15px}</style>")
 assert f.count("</head>") == 1
 f = f.replace("</head>", CSS + "</head>")
